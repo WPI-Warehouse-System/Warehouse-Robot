@@ -27,6 +27,7 @@ class LineFollower{
 	   void lineFollowBackwards();
 	   void lineFollowForwards();
 	   void resetLineCount();
+	   bool onMarker();
 
     private:
 };

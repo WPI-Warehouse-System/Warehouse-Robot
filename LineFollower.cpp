@@ -85,6 +85,11 @@ void LineFollower::lineFollowForwards(){
       robotChassis->myright -> setVelocityDegreesPerSecond(lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection);
 }
 
+bool LineFollower::onMarker(){
+	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
+    int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+    return (leftSensorValue >= ON_BLACK && rightSensorValue>= ON_BLACK);
+}
 void LineFollower::resetLineCount(){
     lineCount = 0;
 }

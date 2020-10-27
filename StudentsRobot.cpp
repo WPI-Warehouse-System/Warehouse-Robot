@@ -12,7 +12,8 @@ uint32_t startTime = 0;
 
 StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 		PIDMotor * motor3, Servo * servo, IRCamSimplePacketComsServer * IRCam,
-		GetIMU * imu): robotChassis(motor2, motor1, 230, 30, imu), lineSensor(&robotChassis) {
+		GetIMU * imu): robotChassis(motor2, motor1, 230, 30, imu), lineSensor(&robotChassis),
+				       navigation(&robotChassis, &lineSensor), parking(&robotChassis, &lineSensor) {
 	Serial.println("StudentsRobot::StudentsRobot constructor called here ");
 
 	this->servo = servo;
@@ -188,31 +189,58 @@ void StudentsRobot::updateStateMachine() {
 //		}
 
 // Navigation
+//		static int myCase = 1;
+//		static int myCaseAfterNav = 2;
+//		switch(myCase){
+//			case 1:
+//				// set a waypoint
+//				setNavGoal(2, -2);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 2;
+//				// set the state
+//				myCase = 4;
+//				 break;
+//			case 2:
+//                // set a waypoint
+//				setNavGoal(0, 0);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 3;
+//				// set the state
+//				myCase = 4;
+//				 break;
+//			case 3:
+//				 myCase = 1;
+//				 status = Running;
+//				 break;
+//			case 4:
+//				 if(checkNavStatus() == FINISHED){
+//					 myCase = myCaseAfterNav;
+//				 }
+//				 break;
+//		}
+// PARKING
 		static int myCase = 1;
 		static int myCaseAfterNav = 2;
 		switch(myCase){
 			case 1:
 				// set a waypoint
-				setNavGoal(2, -2, &robotChassis, &lineSensor);
+				navigation.setNavGoal(2, 0);
 				// set the state to go to after the waypoint is reached
 				myCaseAfterNav = 2;
 				// set the state
 				myCase = 4;
 				 break;
 			case 2:
-                // set a waypoint
-				setNavGoal(0, 0, &robotChassis, &lineSensor);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 3;
-				// set the state
-				myCase = 4;
+                 if(parking.checkParkingStatus() == FINISHED_PARKING){
+                	 myCase = 3;
+                 }
 				 break;
 			case 3:
 				 myCase = 1;
 				 status = Running;
 				 break;
 			case 4:
-				 if(checkNavStatus() == FINISHED){
+				 if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
 					 myCase = myCaseAfterNav;
 				 }
 				 break;

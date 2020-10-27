@@ -13,10 +13,10 @@
 #include "src/pid/HBridgeEncoderPIDMotor.h"
 #include "src/pid/ServoAnalogPIDMotor.h"
 #include <ESP32Servo.h>
-#include "NavigationRoutine.h"
-
 #include "DrivingChassis.h"
 #include "LineFollower.h"
+#include "Navigation.h"
+#include "Parking.h"
 #include "Pose.h"
 #include "src/commands/IRCamSimplePacketComsServer.h"
 #include "src/commands/GetIMU.h"
@@ -64,6 +64,8 @@ private:
 	Servo * servo;
 	DrivingChassis robotChassis;
 	LineFollower lineSensor;
+	Navigation navigation;
+	Parking parking;
 	float lsensorVal=0;
 	float rsensorVal=0;
 	long nextTime =0;
@@ -95,8 +97,6 @@ public:
 	 * This is internal data representing the runtime status of the robot for use in its state machine
 	 */
 	RobotStateMachine status = StartupRobot;
-
-	NavigationStates navState = INITIALIZE_NAVIGATION;
 
 	int goalColumn = -2;
 	int goalRow = 2;
