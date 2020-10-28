@@ -168,13 +168,15 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 			 if((millis() - startTimeOfMovement_ms) > timeout_ms){
 					//timeout occured. Stop the robot
 					Serial.println("Detected Timeout\r\n");
+					//Serial.println("CURRENT HEADING: " + String(myChassisPose.currentHeading));
 					stop();
 					performingMovement = false;
 					return TIMED_OUT;
 			   }
 
 			float currentHeading = myChassisPose.initialHeading - IMU->getEULER_azimuth();
-			float headingError = - currentHeading - motionSetpoint;
+			Serial.println("CURRENT HEADING: " + String(currentHeading));
+			float headingError = motionSetpoint - currentHeading;
 			float motorEffort = (turningMovementKp) * headingError;
 			//myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
 			myChassisPose.currentHeading = currentHeading;
@@ -194,8 +196,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 							motorEffort = MAX_MOTOR_EFFORT_DURING_TURN;
 						}
 					}
-					   myleft->setVelocityDegreesPerSecond(-motorEffort);
-					   myright->setVelocityDegreesPerSecond(-motorEffort);
+					   myleft->setVelocityDegreesPerSecond(motorEffort);
+					   myright->setVelocityDegreesPerSecond(motorEffort);
 			}
 	    }
 		    break;
@@ -266,18 +268,18 @@ void DrivingChassis::stop(){
 }
 
 void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
-	float currentHeading = IMU->getEULER_azimuth();
-	float headingError = - currentHeading - targetHeading;
+	float currentHeading = myChassisPose.initialHeading - IMU->getEULER_azimuth();
+	float headingError = targetHeading - currentHeading;
 	float motorEffort = (turningMovementKp) * headingError;
 
 	if(direction == DRIVING_BACKWARDS){
-		myleft->setVelocityDegreesPerSecond((MAX_SPEED_MM_PER_SEC - motorEffort)*MM_TO_WHEEL_DEGREES);
-		myright->setVelocityDegreesPerSecond((-MAX_SPEED_MM_PER_SEC - motorEffort)*MM_TO_WHEEL_DEGREES);
+		myleft->setVelocityDegreesPerSecond((MAX_SPEED_MM_PER_SEC + motorEffort)*MM_TO_WHEEL_DEGREES);
+		myright->setVelocityDegreesPerSecond((-MAX_SPEED_MM_PER_SEC + motorEffort)*MM_TO_WHEEL_DEGREES);
 	}
 
 	else if(direction == DRIVING_FORWARDS){
-		myright->setVelocityDegreesPerSecond((MAX_SPEED_MM_PER_SEC - motorEffort)*MM_TO_WHEEL_DEGREES);
-	    myleft->setVelocityDegreesPerSecond((-MAX_SPEED_MM_PER_SEC - motorEffort)*MM_TO_WHEEL_DEGREES);
+		myright->setVelocityDegreesPerSecond((MAX_SPEED_MM_PER_SEC + motorEffort)*MM_TO_WHEEL_DEGREES);
+	    myleft->setVelocityDegreesPerSecond((-MAX_SPEED_MM_PER_SEC + motorEffort)*MM_TO_WHEEL_DEGREES);
 	}
 }
 /**

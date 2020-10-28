@@ -19,7 +19,7 @@ ParkingRoutineStates Parking::checkParkingStatus(){
 			break;
 		case TURNING_TO_SPACE:
 			Serial.println("TURNING TO SPACE");
-			drivingChassis->turnToHeading(-90, 5000);
+			drivingChassis->turnToHeading(-90, 7500);
 			parkingStateAfterMotionSetpointReached = BACKING_UP_TO_OUTER_EDGE;
 			parkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_PARKING;
 			break;
