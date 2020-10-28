@@ -12,11 +12,6 @@ Parking::Parking(DrivingChassis *robotChassis, LineFollower* lineFollower){
 	lineSensor = lineFollower;
 }
 
-void Parking::initializeParkingRoutine(DrivingChassis* chassis, LineFollower* lineFollowingSensor){
-	drivingChassis = chassis;
-	lineSensor = lineFollowingSensor;
-}
-
 ParkingRoutineStates Parking::checkParkingStatus(){
 	switch(parkingState){
 		case INITIALIZE_PARKING:
@@ -56,6 +51,37 @@ ParkingRoutineStates Parking::checkParkingStatus(){
 			parkingState = INITIALIZE_PARKING;
 		}
 	return parkingState;
+}
+
+ExitParkingRoutineStates Parking::getOutOfParkingStatus(){
+	switch(exitParkingState){
+		case EXIT_PARKING_SPOT:
+			drivingChassis->driveForward(30, 1000);
+		    exitParkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING;
+			exitParkingStateAfterMotionSetpointReached = DRIVE_UP_TO_OUTER_EDGE;
+		break;
+		case DRIVE_UP_TO_OUTER_EDGE:
+			drivingChassis->driveStraight(-90, DRIVING_FORWARDS);
+			if(lineSensor -> onMarker()){
+				drivingChassis->stop();
+				exitParkingState = DRIVE_FORWARD;
+		    }
+			break;
+		case DRIVE_FORWARD:
+			drivingChassis->driveForward(100, 1500);
+		    exitParkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING;
+			exitParkingStateAfterMotionSetpointReached = FINISHED_EXIT_PARKING;
+			break;
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING:
+			if(drivingChassis->statusOfChassisDriving() == REACHED_SETPOINT){
+				exitParkingState = exitParkingStateAfterMotionSetpointReached;
+			}
+            break;
+		case FINISHED_EXIT_PARKING:
+			Serial.println("EXITED PARKING_SPOT");
+			exitParkingState = EXIT_PARKING_SPOT;
+		}
+	return exitParkingState;
 }
 
 

@@ -228,7 +228,7 @@ void StudentsRobot::updateStateMachine() {
 				// set the state to go to after the waypoint is reached
 				myCaseAfterNav = 2;
 				// set the state
-				myCase = 4;
+				myCase = 5;
 				 break;
 			case 2:
                  if(parking.checkParkingStatus() == FINISHED_PARKING){
@@ -236,14 +236,27 @@ void StudentsRobot::updateStateMachine() {
                  }
 				 break;
 			case 3:
-				 myCase = 1;
-				 status = Running;
+				if(parking.getOutOfParkingStatus() == FINISHED_EXIT_PARKING){
+				     myCase = 4;
+				 }
 				 break;
 			case 4:
+				// set a waypoint
+				navigation.setNavGoal(1, -2);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 6;
+				// set the state
+				myCase = 5;
+				break;
+			case 5:
 				 if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
 					 myCase = myCaseAfterNav;
 				 }
 				 break;
+			case 6:
+				myCase = 1;
+				status = Running;
+				break;
 		}
 // BASIC MOTION
 //

@@ -35,17 +35,17 @@ NavigationStates Navigation::checkNavStatus(){
 				// if our current row isn't our goal row, then we need to navigate to the outer edge
 				// first
 				/// TODO: check where we are, maybe our orientation is correct
-				drivingChassis->turnToHeading(90, 5000);
+				drivingChassis->turnToHeading(90, 7500);
 				navStateAfterMotionSetpointReached = FINDING_OUTER_EDGE;
 				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
 			}
 			else{
 				// otherwise, we just need to find the right column
 				if(drivingChassis->myChassisPose.currentColumn > goalCol){
-					drivingChassis->turnToHeading(-90, 5000);
+					drivingChassis->turnToHeading(-90, 7500);
 				}
 				else{
-					drivingChassis->turnToHeading(90, 5000);
+					drivingChassis->turnToHeading(90, 7500);
 				}
 				navStateAfterMotionSetpointReached = FINDING_COLUMN;
 				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
@@ -83,10 +83,10 @@ NavigationStates Navigation::checkNavStatus(){
 			Serial.println("TURNING TOWARDS ROW");
 			// otherwise, we just need to find the right column
 			if(drivingChassis->myChassisPose.currentRow > goalRow){
-				drivingChassis->turnToHeading(180, 5000);
+				drivingChassis->turnToHeading(180, 7500);
 			}
 			else{
-				drivingChassis->turnToHeading(0, 5000);
+				drivingChassis->turnToHeading(0, 7500);
 			}
 			navStateAfterMotionSetpointReached = FINDING_ROW;
 			navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;

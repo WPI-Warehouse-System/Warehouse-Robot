@@ -20,11 +20,20 @@ enum ParkingRoutineStates{
 	WAIT_FOR_MOTION_SETPOINT_REACHED_PARKING = 5,
 };
 
+enum ExitParkingRoutineStates{
+	EXIT_PARKING_SPOT = 0,
+	DRIVE_UP_TO_OUTER_EDGE = 1,
+	DRIVE_FORWARD = 2,
+	FINISHED_EXIT_PARKING = 3,
+	WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING = 4,
+};
+
 class Parking{
     public:
 	   Parking(DrivingChassis* robotChassis, LineFollower* lineFollower);
 	   void initializeParkingRoutine(DrivingChassis* robotChassis, LineFollower* lineFollower);
 	   ParkingRoutineStates checkParkingStatus();
+	   ExitParkingRoutineStates getOutOfParkingStatus();
 
 	   DrivingChassis* drivingChassis;
 	   LineFollower* lineSensor;
@@ -33,6 +42,11 @@ class Parking{
 
 	   // This is the parkingState that occurs after a setpoint has been reached
 	   ParkingRoutineStates parkingStateAfterMotionSetpointReached;
+
+	   ExitParkingRoutineStates exitParkingState = EXIT_PARKING_SPOT;
+
+	   // This is the parkingState that occurs after a setpoint has been reached
+	   ExitParkingRoutineStates exitParkingStateAfterMotionSetpointReached;
 
     private:
 };

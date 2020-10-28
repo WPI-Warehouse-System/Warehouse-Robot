@@ -173,10 +173,11 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 					return TIMED_OUT;
 			   }
 
-			float currentHeading = IMU->getEULER_azimuth();
+			float currentHeading = myChassisPose.initialHeading - IMU->getEULER_azimuth();
 			float headingError = - currentHeading - motionSetpoint;
 			float motorEffort = (turningMovementKp) * headingError;
-			myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
+			//myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
+			myChassisPose.currentHeading = currentHeading;
 			if(fabs(headingError) <= wheelMovementDeadband_deg)
 			{
 				Serial.println("Reached Setpoint\r\n");
@@ -211,7 +212,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	driveStraight(myChassisPose.heading, DRIVING_FORWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -221,7 +222,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 
 	    	    else{
 	    	    	// sets speed to 20 cm per second
-	    	    	driveStraight(myChassisPose.heading, DRIVING_FORWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
 	    	    }
 	        }
 	        break;
@@ -238,7 +239,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = - currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	driveStraight(myChassisPose.heading, DRIVING_BACKWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -248,7 +249,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 
 	    	    else{
 	    	    	// sets speed to 20 cm per second
-	    	    	driveStraight(myChassisPose.heading, DRIVING_BACKWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
 	    	    }
 	        }
 	        break;
