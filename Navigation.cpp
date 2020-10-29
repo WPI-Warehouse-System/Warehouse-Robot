@@ -111,6 +111,7 @@ NavigationStates Navigation::checkNavStatus(){
             break;
 		case FINISHED_NAVIGATION:
 			navState = INITIALIZE_NAVIGATION;
+			break;
 		}
 	return navState;
 }

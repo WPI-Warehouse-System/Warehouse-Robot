@@ -35,18 +35,18 @@ class Parking{
 	   ParkingRoutineStates checkParkingStatus();
 	   ExitParkingRoutineStates getOutOfParkingStatus();
 
-	   DrivingChassis* drivingChassis;
-	   LineFollower* lineSensor;
+	   DrivingChassis* drivingChassis = NULL;
+	   LineFollower* lineSensor = NULL;
 
 	   ParkingRoutineStates parkingState = INITIALIZE_PARKING;
 
 	   // This is the parkingState that occurs after a setpoint has been reached
-	   ParkingRoutineStates parkingStateAfterMotionSetpointReached;
+	   ParkingRoutineStates parkingStateAfterMotionSetpointReached = INITIALIZE_PARKING;
 
 	   ExitParkingRoutineStates exitParkingState = EXIT_PARKING_SPOT;
 
 	   // This is the parkingState that occurs after a setpoint has been reached
-	   ExitParkingRoutineStates exitParkingStateAfterMotionSetpointReached;
+	   ExitParkingRoutineStates exitParkingStateAfterMotionSetpointReached = EXIT_PARKING_SPOT;
 
     private:
 };

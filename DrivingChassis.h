@@ -88,7 +88,7 @@ public:
 	// moved these over for line following
 	PIDMotor * myleft;
 	PIDMotor * myright;
-	bool performingMovement = false;
+	bool adjustedHeading = false;
 	MotionType motionType;
 	unsigned long startTimeOfMovement_ms;
 	float wheelMovementKp = 3.5;// was 3.9

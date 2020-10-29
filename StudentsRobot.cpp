@@ -178,6 +178,7 @@ void StudentsRobot::updateStateMachine() {
 		// in safe mode
 		break;
 	case Testing:
+		myCommandsStatus = Ready_for_new_task;
 /// LINE FOLLOWING
 //	    if((millis() - startTime) < 7000){
 //			lineSensor.lineFollowForwards();

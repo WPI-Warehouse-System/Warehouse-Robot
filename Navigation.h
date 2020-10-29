@@ -33,14 +33,14 @@ class Navigation{
 	   int rowCount = 0;
 	   int colCount = 0;
 
-	   DrivingChassis* drivingChassis;
-	   LineFollower* lineSensor;
-	   int goalRow;
-	   int goalCol;
+	   DrivingChassis* drivingChassis = NULL;
+	   LineFollower* lineSensor = NULL;
+	   int goalRow = 0;
+	   int goalCol = 0;
 	   NavigationStates navState = INITIALIZE_NAVIGATION;
 
 	   // This is the navState that occurs after a setpoint has been reached
-	   NavigationStates navStateAfterMotionSetpointReached;
+	   NavigationStates navStateAfterMotionSetpointReached = INITIALIZE_NAVIGATION;
 	   void setNavGoal(int row, int col);
 
 	   NavigationStates checkNavStatus();

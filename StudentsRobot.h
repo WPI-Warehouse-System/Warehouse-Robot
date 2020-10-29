@@ -92,7 +92,7 @@ public:
 	 *
 	 * this is sent upstream to the Java GUI to notify it of current state
 	 */
-	ComStackStatusState myCommandsStatus = Ready_for_new_task;
+	ComStackStatusState myCommandsStatus = Picking_up;
 	/**
 	 * This is internal data representing the runtime status of the robot for use in its state machine
 	 */

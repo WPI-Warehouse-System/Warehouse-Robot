@@ -49,6 +49,7 @@ ParkingRoutineStates Parking::checkParkingStatus(){
 		case FINISHED_PARKING:
 			Serial.println("PARKED");
 			parkingState = INITIALIZE_PARKING;
+			break;
 		}
 	return parkingState;
 }
@@ -68,7 +69,7 @@ ExitParkingRoutineStates Parking::getOutOfParkingStatus(){
 		    }
 			break;
 		case DRIVE_FORWARD:
-			drivingChassis->driveForward(100, 1500);
+			drivingChassis->driveForward(130, 2500);
 		    exitParkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING;
 			exitParkingStateAfterMotionSetpointReached = FINISHED_EXIT_PARKING;
 			break;

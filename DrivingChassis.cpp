@@ -170,13 +170,32 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 					Serial.println("Detected Timeout\r\n");
 					//Serial.println("CURRENT HEADING: " + String(myChassisPose.currentHeading));
 					stop();
-					performingMovement = false;
+					adjustedHeading = false;
 					return TIMED_OUT;
 			   }
 
-			float currentHeading = myChassisPose.initialHeading - IMU->getEULER_azimuth();
-			Serial.println("CURRENT HEADING: " + String(currentHeading));
+			float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
+			// wrap-around for currentHeading
+			if(fabs(currentHeading) > 360){
+				if(currentHeading > 360){
+					currentHeading -= 360;
+				}
+				else{
+					currentHeading += 360;
+				}
+			}
 			float headingError = motionSetpoint - currentHeading;
+
+			// we don't want to to make long turns
+			if(fabs(headingError) > 180){
+				if(headingError > 180){
+					headingError -= 360;
+				}
+				else{
+					headingError += 360;
+				}
+			}
+
 			float motorEffort = (turningMovementKp) * headingError;
 			//myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
 			myChassisPose.currentHeading = currentHeading;
@@ -184,6 +203,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 			{
 				Serial.println("Reached Setpoint\r\n");
 				stop();
+				adjustedHeading = false;
 				return REACHED_SETPOINT;
 			}
 			else{
@@ -268,8 +288,25 @@ void DrivingChassis::stop(){
 }
 
 void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
-	float currentHeading = myChassisPose.initialHeading - IMU->getEULER_azimuth();
+	float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
+	if(fabs(currentHeading) > 360){
+		if(currentHeading > 360){
+			currentHeading -= 360;
+		}
+		else{
+			currentHeading += 360;
+		}
+	}
 	float headingError = targetHeading - currentHeading;
+	if(fabs(headingError) > 180){
+
+		if(headingError > 180){
+			headingError -= 360;
+		}
+		else{
+			headingError += 360;
+		}
+	}
 	float motorEffort = (turningMovementKp) * headingError;
 
 	if(direction == DRIVING_BACKWARDS){

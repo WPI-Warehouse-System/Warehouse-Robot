@@ -146,6 +146,8 @@ void RobotControlCenter::setup() {
 	coms.attach(new GetPDVelocityConstants(numberOfPID, pidList));
 	coms.attach(new SetPIDVelocity(numberOfPID, pidList));
 	coms.attach(new SetPDVelocityConstants(numberOfPID, pidList));
+	// Get the status of the robot
+	coms.attach(new GetStatus(robot));// @suppress("Method cannot be resolved")
 
 #endif
 
