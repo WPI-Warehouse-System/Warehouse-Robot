@@ -11,6 +11,7 @@
 #include "src/commands/GetIMU.h"
 #include "config.h"
 #include "Pose.h"
+#include "LineFollower.h"
 
 #define WHEEL_DEGREES_TO_BODY_DEGREES 4.25F
 #define MM_TO_WHEEL_DEGREES 2.1174F
@@ -98,6 +99,7 @@ public:
 	float motionSetpoint;
 	float timeout_ms;
 	Pose myChassisPose;
+	LineFollower lineSensor;
 
 	virtual ~DrivingChassis();
 
@@ -110,8 +112,8 @@ public:
 	 * @param wheelRadiusMM is the measurment in milimeters of the radius of the wheels
 	 * @param imu The object that is used to access the IMU data
 	 */
-	DrivingChassis(PIDMotor * left, PIDMotor * right, float wheelTrackMM,
-			float wheelRadiusMM,GetIMU * imu);
+	DrivingChassis(PIDMotor * left, PIDMotor * right,
+			float wheelTrackMM, float wheelRadiusMM, GetIMU * imu);
 
 	/**
 	 * Start a drive backwards action using the encoders and setpoint interpolation
@@ -199,6 +201,14 @@ public:
 	 * @note this function is fast-return and should not block
 	 */
 	DrivingStatus statusOfChassisDriving();
+
+	// I decided to move all line following code into the driving chassis, and out of line follower class
+    // line follower will still hold sensor specific information such as black threshold and gains, as well as functions
+	// for detecting when we're on a line
+
+	 void lineFollowBackwards();
+
+     void lineFollowForwards();
 
 	/**
 	 * Stops all motors

@@ -27,8 +27,8 @@
  * Feel free to add ot remove values from here
  */
 enum RobotStateMachine {
-	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4,WAIT_FOR_MOTORS_TO_FINNISH=5,WAIT_FOR_TIME=6,
-	Testing = 7,
+	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
+	Testing = 7, Navigating = 8,
 
 };
 /**
@@ -63,9 +63,6 @@ private:
 	PIDMotor * motor3;
 	Servo * servo;
 	DrivingChassis robotChassis;
-	LineFollower lineSensor;
-	Navigation navigation;
-	Parking parking;
 	float lsensorVal=0;
 	float rsensorVal=0;
 	long nextTime =0;
@@ -73,6 +70,7 @@ private:
 	RobotStateMachine nextStatus = StartupRobot;
 	IRCamSimplePacketComsServer * IRCamera;
 	GetIMU * IMU;
+	LineFollower* lineSensor;
 public:
 	/**
 	 * Constructor for StudentsRobot
@@ -97,6 +95,9 @@ public:
 	 * This is internal data representing the runtime status of the robot for use in its state machine
 	 */
 	RobotStateMachine status = StartupRobot;
+
+	Navigation navigation;
+	Parking parking;
 
 	int goalColumn = -2;
 	int goalRow = 2;

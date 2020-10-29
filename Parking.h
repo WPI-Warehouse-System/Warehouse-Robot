@@ -30,13 +30,11 @@ enum ExitParkingRoutineStates{
 
 class Parking{
     public:
-	   Parking(DrivingChassis* robotChassis, LineFollower* lineFollower);
-	   void initializeParkingRoutine(DrivingChassis* robotChassis, LineFollower* lineFollower);
+	   Parking(DrivingChassis* robotChassis);
 	   ParkingRoutineStates checkParkingStatus();
 	   ExitParkingRoutineStates getOutOfParkingStatus();
 
-	   DrivingChassis* drivingChassis = NULL;
-	   LineFollower* lineSensor = NULL;
+	   DrivingChassis* chassis = NULL;
 
 	   ParkingRoutineStates parkingState = INITIALIZE_PARKING;
 

@@ -24,7 +24,7 @@ enum NavigationStates{
 
 class Navigation{
     public:
-	   Navigation(DrivingChassis* robotChassis, LineFollower* lineFollower);
+	   Navigation(DrivingChassis* robotChassis);
 	   // current row and current column will be updated by the line sensor lineCount
 	   int currentRow = 0;
 	   int currentColumn = 0;
@@ -33,8 +33,7 @@ class Navigation{
 	   int rowCount = 0;
 	   int colCount = 0;
 
-	   DrivingChassis* drivingChassis = NULL;
-	   LineFollower* lineSensor = NULL;
+	   DrivingChassis* chassis = NULL;
 	   int goalRow = 0;
 	   int goalCol = 0;
 	   NavigationStates navState = INITIALIZE_NAVIGATION;

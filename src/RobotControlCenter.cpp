@@ -124,7 +124,6 @@ void RobotControlCenter::setup() {
 	myDFRobotIRPosition.begin();
 	serverIR = new IRCamSimplePacketComsServer(&myDFRobotIRPosition);
 #endif
-
 	robot = new StudentsRobot(&motor1, &motor2, &motor3, &servo, serverIR,
 			sensor);
 
@@ -148,6 +147,8 @@ void RobotControlCenter::setup() {
 	coms.attach(new SetPDVelocityConstants(numberOfPID, pidList));
 	// Get the status of the robot
 	coms.attach(new GetStatus(robot));// @suppress("Method cannot be resolved")
+	// GettingNavGoals
+    coms.attach(new SetNavGoal(robot));// @suppress("Method cannot be resolved")
 
 #endif
 
