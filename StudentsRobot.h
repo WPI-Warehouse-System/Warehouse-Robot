@@ -28,7 +28,7 @@
  */
 enum RobotStateMachine {
 	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
-	Testing = 7, Navigating = 8,
+	Testing = 7, Navigating = 8, ParkingRobot = 9,
 
 };
 /**
@@ -54,6 +54,25 @@ enum ComStackStatusState {
 };
 
 /**
+ * @enum ParkingStates
+ */
+enum ParkingStates {
+	SETTING_PARKING_GOAL = 0,
+	GOING_TO_PARKING_SPACE = 1,
+	PARKING = 2,
+};
+
+/**
+ * @enum NavigatingStates
+ */
+enum NavigatingStates {
+	CHECKING_IF_PARKED = 0,
+	LEAVING_PARKING_SPOT = 1,
+	SETTING_NAV_GOAL = 2,
+	NAVIGATING = 3,
+};
+
+/**
  * @class StudentsRobot
  */
 class StudentsRobot {
@@ -72,6 +91,7 @@ private:
 	GetIMU * IMU;
 	LineFollower* lineSensor;
 public:
+	bool robotParked = false;
 	/**
 	 * Constructor for StudentsRobot
 	 *
@@ -96,9 +116,18 @@ public:
 	 */
 	RobotStateMachine status = StartupRobot;
 
+	// This is the status to run to after navigation. Initialize to Running
+	RobotStateMachine statusAfterNav = Running;
+
+	// State variables for the enumeration of different routines. Initialized to first case
+	ParkingStates parkingStatus = SETTING_PARKING_GOAL;
+	NavigatingStates navigationStatus = SETTING_NAV_GOAL;
+
+	// Objects for different routines robot is capable of
 	Navigation navigation;
 	Parking parking;
 
+	// goal column and goal row for navigation from a UI command
 	int goalColumn = -2;
 	int goalRow = 2;
 

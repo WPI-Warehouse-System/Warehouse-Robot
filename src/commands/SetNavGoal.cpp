@@ -17,8 +17,11 @@ void SetNavGoal::event(float * buffer) {
 	float row = buffer[0];
 	float column = buffer[1];
 
-	robotPointer->navigation.setNavGoal((int) row, (int) column);
+	robotPointer -> goalRow = (int) row;
+	robotPointer -> goalColumn = (int) column;
+	//robotPointer -> navigation.setNavGoal(row, column);
 	robotPointer -> status = Navigating;
+
 }
 
 

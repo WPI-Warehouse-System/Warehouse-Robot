@@ -196,7 +196,6 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 					headingError += 360;
 				}
 			}
-
 			float motorEffort = (turningMovementKp) * headingError;
 			//myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
 			myChassisPose.currentHeading = currentHeading;

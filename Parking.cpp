@@ -17,13 +17,13 @@ ParkingRoutineStates Parking::checkParkingStatus(){
 			parkingState = TURNING_TO_SPACE;
 			break;
 		case TURNING_TO_SPACE:
-			Serial.println("TURNING TO SPACE");
+			//Serial.println("TURNING TO SPACE");
 			chassis->turnToHeading(-90, 7500);
 			parkingStateAfterMotionSetpointReached = BACKING_UP_TO_OUTER_EDGE;
 			parkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_PARKING;
 			break;
 		case BACKING_UP_TO_OUTER_EDGE:
-			Serial.println("BACKING UP TO OUTER EDGE");
+			//Serial.println("BACKING UP TO OUTER EDGE");
 			chassis->driveStraight(-90, DRIVING_BACKWARDS);
             if(chassis -> lineSensor.onMarker()){
             	// get off the marker, so you can count the one that starts the parking space
@@ -33,7 +33,7 @@ ParkingRoutineStates Parking::checkParkingStatus(){
             }
 			break;
 		case BACKING_INTO_SPACE:
-			Serial.println("BACKING INTO SPACE");
+			//Serial.println("BACKING INTO SPACE");
 			chassis->driveStraight(-90, DRIVING_BACKWARDS);
             if(chassis -> lineSensor.onMarker()){
             	chassis->stop();
@@ -46,7 +46,7 @@ ParkingRoutineStates Parking::checkParkingStatus(){
 			}
             break;
 		case FINISHED_PARKING:
-			Serial.println("PARKED");
+			//Serial.println("PARKED");
 			parkingState = INITIALIZE_PARKING;
 			break;
 		}

@@ -42,16 +42,22 @@ NavigationStates Navigation::checkNavStatus(){
 				// otherwise, we just need to find the right column
 				if(chassis->myChassisPose.currentColumn > goalCol){
 					chassis->turnToHeading(-90, 7500);
+					navStateAfterMotionSetpointReached = FINDING_COLUMN;
+					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
 				}
-				else{
+				else if(chassis->myChassisPose.currentColumn < goalCol){
 					chassis->turnToHeading(90, 7500);
+					navStateAfterMotionSetpointReached = FINDING_COLUMN;
+					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
 				}
-				navStateAfterMotionSetpointReached = FINDING_COLUMN;
-				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				// we're at the right column and row
+				else{
+					navState = FINISHED_NAVIGATION;
+				}
 			}
 			break;
 		case FINDING_OUTER_EDGE:
-			Serial.println("FINDING COL: 0, CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
+			//Serial.println("FINDING COL: 0, CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
 			// navigate until column == 0
 			if(chassis->myChassisPose.currentColumn != 0){
 				// if the column is wrong.
@@ -63,7 +69,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_ROW:
-			Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
+			//Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
 			if(chassis->myChassisPose.currentRow != goalRow){
 				// if the row is wrong.
 				chassis->lineFollowForwards();
@@ -79,19 +85,25 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case TURN_TOWARDS_CORRECT_ROW:
-			Serial.println("TURNING TOWARDS ROW");
+			//Serial.println("TURNING TOWARDS ROW");
 			// otherwise, we just need to find the right column
 			if(chassis->myChassisPose.currentRow > goalRow){
 				chassis->turnToHeading(180, 7500);
+				navStateAfterMotionSetpointReached = FINDING_ROW;
+				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
 			}
-			else{
+			else if(chassis->myChassisPose.currentRow < goalRow){
 				chassis->turnToHeading(0, 7500);
+				navStateAfterMotionSetpointReached = FINDING_ROW;
+				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
 			}
-			navStateAfterMotionSetpointReached = FINDING_ROW;
-			navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+			// if we're at the right row
+			else{
+				navState = TURN_TOWARDS_CORRECT_COLUMN;
+			}
 			break;
 		case FINDING_COLUMN:
-			Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
+			//Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
 			if(chassis->myChassisPose.currentColumn != goalCol){
 				// if the column is wrong.
 				chassis->lineFollowForwards();

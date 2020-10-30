@@ -149,6 +149,8 @@ void RobotControlCenter::setup() {
 	coms.attach(new GetStatus(robot));// @suppress("Method cannot be resolved")
 	// GettingNavGoals
     coms.attach(new SetNavGoal(robot));// @suppress("Method cannot be resolved")
+    // Setting parking command
+    coms.attach(new SetParkCommand(robot));// @suppress("Method cannot be resolved")
 
 #endif
 
@@ -193,5 +195,5 @@ void RobotControlCenter::fastLoop() {
 #endif
 	//uint32_t startTime = micros();
 	robot->updateStateMachine();
-	//Serial.println("Time Taken: "  + String(micros() - startTime) + "\r\n" );
+//	Serial.println("Time Taken: "  + String(micros() - startTime) + "\r\n" );
 }
