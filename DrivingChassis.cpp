@@ -201,7 +201,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 			myChassisPose.currentHeading = currentHeading;
 			if(fabs(headingError) <= wheelMovementDeadband_deg)
 			{
-				Serial.println("Reached Setpoint\r\n");
+				//Serial.println("Reached Setpoint\r\n");
 				stop();
 				adjustedHeading = false;
 				return REACHED_SETPOINT;
@@ -236,7 +236,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    	float rightWheelError_mm = currentDistanceMovedRightWheel_mm - motionSetpoint;
 	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
-						Serial.println("Reached Setpoint \r\n");
+						//Serial.println("Reached Setpoint \r\n");
 						stop();
 						return REACHED_SETPOINT;
 					}
@@ -263,7 +263,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    	float rightWheelError_mm = - currentDistanceMovedRightWheel_mm - motionSetpoint;
 	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
-						Serial.println("Reached Setpoint \r\n");
+						//Serial.println("Reached Setpoint \r\n");
 						stop();
 						return REACHED_SETPOINT;
 					}
@@ -364,15 +364,34 @@ void DrivingChassis::lineFollowForwards(){
 		   lineSensor.lineCount++;
 	      // Mathematically speaking, this should only increment one of the following. Either
 	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
-	      float headingInRadians = (myChassisPose.currentHeading)*(PI/180.0);
-	      Serial.println(String(round(cos(headingInRadians))) + " " + String(round(sin(headingInRadians))));
-	      myChassisPose.rowCount += abs(round(cos(headingInRadians)));
-	      myChassisPose.colCount += round(sin(headingInRadians)); // have this in case we do double columns
-	      if(myChassisPose.rowCount == 2){
-	          myChassisPose.currentRow += round(cos(headingInRadians));
-	          myChassisPose.rowCount = 0;
-	      }
-	      myChassisPose.currentColumn += round(sin(headingInRadians));
+		  int ordinalDirection_degrees = myChassisPose.getOrientationToClosest90();
+
+		  // we need to count rows
+		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
+			  myChassisPose.rowCount += 1;
+		      if(myChassisPose.rowCount == 2){
+		    	  if(ordinalDirection_degrees == 180)
+		              myChassisPose.currentRow -= 1;
+		    	  else
+		    		  myChassisPose.currentRow += 1;
+		          myChassisPose.rowCount = 0;
+		      }
+		  }
+
+		  // we need to count columns
+		  else if((ordinalDirection_degrees == 90) || (ordinalDirection_degrees == -90)){
+			  myChassisPose.currentColumn += ordinalDirection_degrees/90;
+		  }
+
+// NOTE: I CHANGED THE FOLLOWING TO WHAT IS ABOVE THIS COMMENT TO IMPROVE COMPUTATION SPEED
+//	      float headingInRadians = (myChassisPose.currentHeading)*(PI/180.0);
+//	      myChassisPose.rowCount += abs(round(cos(headingInRadians)));
+//	      myChassisPose.colCount += round(sin(headingInRadians)); // have this in case we do double columns
+//	      if(myChassisPose.rowCount == 2){
+//	          myChassisPose.currentRow += round(cos(headingInRadians));
+//	          myChassisPose.rowCount = 0;
+//	      }
+//	      myChassisPose.currentColumn += round(sin(headingInRadians));
 	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
 	    }
 	    //Serial.println("Line Count: " + String(lineCount));

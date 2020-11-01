@@ -182,20 +182,20 @@ void StudentsRobot::updateStateMachine() {
 	case Navigating:
 		switch(navigationStatus){
 		    case SETTING_NAV_GOAL:
-		    	Serial.println("SETTING NAV GOAL TO: " + String(goalRow) + " " + String(goalColumn));
+		    	//Serial.println("SETTING NAV GOAL TO: " + String(goalRow) + " " + String(goalColumn));
 			    navigation.setNavGoal(goalRow, goalColumn);
 			    navigationStatus = NAVIGATING;
 			    navigationStatus = CHECKING_IF_PARKED;
 			    break;
 
 			case CHECKING_IF_PARKED:
-				Serial.println("CHECKING IF PARKED");
+				//Serial.println("CHECKING IF PARKED");
 				if(robotParked){
-					Serial.println("PARKED");
+					//Serial.println("PARKED");
 					navigationStatus = LEAVING_PARKING_SPOT;
 				}
 				else{
-					Serial.println("NOT PARKED");
+					//Serial.println("NOT PARKED");
 					navigationStatus = NAVIGATING;
 				}
 				break;
@@ -212,7 +212,7 @@ void StudentsRobot::updateStateMachine() {
 			case NAVIGATING:
 				if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
 					navigationStatus = SETTING_NAV_GOAL;
-					Serial.println("FINISHED NAVIGATION");
+					//Serial.println("FINISHED NAVIGATION");
 					status = statusAfterNav;
 				}
 				break;

@@ -18,7 +18,13 @@ ParkingRoutineStates Parking::checkParkingStatus(){
 			break;
 		case TURNING_TO_SPACE:
 			//Serial.println("TURNING TO SPACE");
+			// TODO: in the future, outside the scope of this project, the parking needs to know if the space is on the right
+			// or the left of the outer lane. For right now, in our current implementation, we assume there is only one lane of parking spots.
+
+			// since this is a turnToHeading, not just a turn -90, this should work regardless of how you approach the spot
+			// (assuming the spot is left of the line)
 			chassis->turnToHeading(-90, 7500);
+
 			parkingStateAfterMotionSetpointReached = BACKING_UP_TO_OUTER_EDGE;
 			parkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_PARKING;
 			break;

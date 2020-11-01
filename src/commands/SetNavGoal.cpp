@@ -21,6 +21,7 @@ void SetNavGoal::event(float * buffer) {
 	robotPointer -> goalColumn = (int) column;
 	//robotPointer -> navigation.setNavGoal(row, column);
 	robotPointer -> status = Navigating;
+	robotPointer -> statusAfterNav = Running;
 
 }
 

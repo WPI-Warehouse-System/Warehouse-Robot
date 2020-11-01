@@ -195,5 +195,7 @@ void RobotControlCenter::fastLoop() {
 #endif
 	//uint32_t startTime = micros();
 	robot->updateStateMachine();
-//	Serial.println("Time Taken: "  + String(micros() - startTime) + "\r\n" );
+	//if((micros() - startTime) > 100){
+	//    Serial.println("Time Taken: "  + String(micros() - startTime) + "\r\n" );
+	//}
 }

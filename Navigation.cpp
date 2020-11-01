@@ -18,7 +18,7 @@ void Navigation::setNavGoal(int row, int col){
 NavigationStates Navigation::checkNavStatus(){
 	switch(navState){
 		case INITIALIZE_NAVIGATION:
-			Serial.println("INIT NAV");
+			//Serial.println("INIT NAV");
 			// if we're in the outerlane, then there really isn't a need to find the outerlane
 			if(chassis->myChassisPose.currentColumn == 0){
 				navState = TURN_TOWARDS_CORRECT_ROW;
@@ -28,27 +28,42 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case TURN_TOWARDS_CORRECT_COLUMN:
-			Serial.println("TURNING TOWARDS COLUMN");
+			//Serial.println("TURNING TOWARDS COLUMN");
 			// determine what is our first state
 			if(chassis->myChassisPose.currentRow != goalRow){
 				// if our current row isn't our goal row, then we need to navigate to the outer edge
 				// first
-				/// TODO: check where we are, maybe our orientation is correct
-				chassis->turnToHeading(90, 7500);
-				navStateAfterMotionSetpointReached = FINDING_OUTER_EDGE;
-				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+			    if(chassis->myChassisPose.getOrientationToClosest90() != 90){
+				    chassis->turnToHeading(90, 7500);
+					navStateAfterMotionSetpointReached = FINDING_OUTER_EDGE;
+					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+			    }
+			    else{
+			    	navState = FINDING_OUTER_EDGE;
+			    }
+
 			}
 			else{
 				// otherwise, we just need to find the right column
 				if(chassis->myChassisPose.currentColumn > goalCol){
-					chassis->turnToHeading(-90, 7500);
-					navStateAfterMotionSetpointReached = FINDING_COLUMN;
-					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				    if(chassis->myChassisPose.getOrientationToClosest90() != -90){
+						chassis->turnToHeading(-90, 7500);
+						navStateAfterMotionSetpointReached = FINDING_COLUMN;
+						navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				    }
+				    else{
+				    	navState = FINDING_COLUMN;
+				    }
 				}
 				else if(chassis->myChassisPose.currentColumn < goalCol){
-					chassis->turnToHeading(90, 7500);
-					navStateAfterMotionSetpointReached = FINDING_COLUMN;
-					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				    if(chassis->myChassisPose.getOrientationToClosest90() != 90){
+						chassis->turnToHeading(90, 7500);
+						navStateAfterMotionSetpointReached = FINDING_COLUMN;
+						navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				    }
+				    else{
+				    	navState = FINDING_COLUMN;
+				    }
 				}
 				// we're at the right column and row
 				else{
@@ -88,14 +103,26 @@ NavigationStates Navigation::checkNavStatus(){
 			//Serial.println("TURNING TOWARDS ROW");
 			// otherwise, we just need to find the right column
 			if(chassis->myChassisPose.currentRow > goalRow){
-				chassis->turnToHeading(180, 7500);
-				navStateAfterMotionSetpointReached = FINDING_ROW;
-				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+			    if(chassis->myChassisPose.getOrientationToClosest90() != 180){
+					chassis->turnToHeading(180, 7500);
+					navStateAfterMotionSetpointReached = FINDING_ROW;
+					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+			    }
+			    else{
+			    	navState = FINDING_ROW;
+			    }
+
 			}
 			else if(chassis->myChassisPose.currentRow < goalRow){
-				chassis->turnToHeading(0, 7500);
-				navStateAfterMotionSetpointReached = FINDING_ROW;
-				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				if(chassis->myChassisPose.getOrientationToClosest90() != 0){
+					chassis->turnToHeading(0, 7500);
+					navStateAfterMotionSetpointReached = FINDING_ROW;
+					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				}
+				else{
+					navState = FINDING_ROW;
+				}
+
 			}
 			// if we're at the right row
 			else{

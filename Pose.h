@@ -7,6 +7,8 @@
 #ifndef POSE_H_
 #define POSE_H_
 
+#define PI 3.14159265f
+
 class Pose{
     public:
 	   Pose();
@@ -18,7 +20,7 @@ class Pose{
 	   float initialHeading = -90;
 	   int rowCount = 0;
 	   int colCount = 0;
-
+       int getOrientationToClosest90();
     private:
 };
 
