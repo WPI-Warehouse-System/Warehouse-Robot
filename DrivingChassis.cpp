@@ -114,6 +114,16 @@ void DrivingChassis::driveBackwardsFromInterpolation(float mmDistanceFromCurrent
     myright -> startInterpolationDegrees(mmDistanceFromCurrent * MM_TO_WHEEL_DEGREES, msDuration, LIN);
 }
 
+/**
+ * Start a drive backward action
+ *
+ * @param mmDistanceFromCurrent is the distance the mobile base should drive backward
+ * @param msDuration is the time in miliseconds that the drive action should take
+ *
+ * @note this function is fast-return and should not block
+ * @note pidmotorInstance->overrideCurrentPosition(0); can be used to "zero out" the motor to
+ * 		 allow for relative moves. Otherwise the motor is always in ABSOLUTE mode
+ */
 void DrivingChassis::driveBackwards(float mmDistanceFromCurrent, int msDuration){
 		// if we're not performing an action
 		// start a timer, reset encoders
@@ -157,7 +167,7 @@ void DrivingChassis::turnToHeading(float degreesToRotateBase, int msDuration){
 /**
  * Check to see if the chassis is performing an action
  *
- * @return false is the chassis is driving, true is the chassis msDuration has elapsed
+ * @return drivingStatus depending on where we are in the motion
  *
  * @note this function is fast-return and should not block
  */
@@ -282,11 +292,24 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	return GOING_TO_SETPOINT;
 }
 
+/**
+ * stop the robot
+ */
 void DrivingChassis::stop(){
 	myleft -> stop();
 	myright -> stop();
 }
 
+/**
+ * drive straight, forward or backward
+ *
+ * @param targetHeading heading to maintain in degrees
+ * @param direction is the direction we are moving, forward or backward
+ *
+ *  @note this function is fast-return and should not block
+ *  @note pidmotorInstance->overrideCurrentPosition(0); can be used to "zero out" the motor to
+ * 		  allow for relative moves. Otherwise the motor is always in ABSOLUTE mode
+ */
 void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 	float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
 	if(fabs(currentHeading) > 360){
@@ -320,6 +343,9 @@ void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 	}
 }
 
+/**
+ * line follow in the backwards direction, if the line follower is mounted to the back of the robot
+ */
 void DrivingChassis::lineFollowBackwards(){
 	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
 	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
@@ -328,31 +354,49 @@ void DrivingChassis::lineFollowBackwards(){
 	  if(leftSensorValue >= lineSensor.ON_BLACK && rightSensorValue>= lineSensor.ON_BLACK)
 	  {
 	   if(lineSensor.canCountLine){
-	      lineSensor.lineCount++;
+		   lineSensor.lineCount++;
 	      // Mathematically speaking, this should only increment one of the following. Either
-	      // row or column
-	      float headingInRadians = (myChassisPose.currentHeading)*(PI/180.0);
-	      Serial.println(String(round(cos(headingInRadians))) + " " + String(round(sin(headingInRadians))));
-	      myChassisPose.currentRow += round(cos(headingInRadians));
-	      myChassisPose.currentColumn += round(sin(headingInRadians));
-	      lineSensor.canCountLine = false;
+	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
+		  int ordinalDirection_degrees = myChassisPose.getOrientationToClosest90();
+
+		  // we need to count rows
+		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
+			  myChassisPose.rowCount += 1;
+		      if(myChassisPose.rowCount == 2){
+		    	  if(ordinalDirection_degrees == 180)
+		              myChassisPose.currentRow -= 1;
+		    	  else
+		    		  myChassisPose.currentRow += 1;
+		          myChassisPose.rowCount = 0;
+		      }
+		  }
+
+		  // we need to count columns
+		  else if((ordinalDirection_degrees == 90) || (ordinalDirection_degrees == -90)){
+			  myChassisPose.currentColumn += ordinalDirection_degrees/90;
+		  }
+
+	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
 	    }
 	    //Serial.println("Line Count: " + String(lineCount));
 	  }
 
 
 	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
-			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpBackwards;
-			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpBackwards;
+			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
 			lineSensor.canCountLine = true;
 	  }
 	  else{
-		    lineSensor.canCountLine = true;
+		  lineSensor.canCountLine = true;
 	  }
 	  myleft -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedBackwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection);
       myright -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection);
 }
 
+/**
+ * line follow in the forwards direction, if the line follower is mounted to the front of the robot
+ */
 void DrivingChassis::lineFollowForwards(){
 	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
 	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
@@ -383,15 +427,6 @@ void DrivingChassis::lineFollowForwards(){
 			  myChassisPose.currentColumn += ordinalDirection_degrees/90;
 		  }
 
-// NOTE: I CHANGED THE FOLLOWING TO WHAT IS ABOVE THIS COMMENT TO IMPROVE COMPUTATION SPEED
-//	      float headingInRadians = (myChassisPose.currentHeading)*(PI/180.0);
-//	      myChassisPose.rowCount += abs(round(cos(headingInRadians)));
-//	      myChassisPose.colCount += round(sin(headingInRadians)); // have this in case we do double columns
-//	      if(myChassisPose.rowCount == 2){
-//	          myChassisPose.currentRow += round(cos(headingInRadians));
-//	          myChassisPose.rowCount = 0;
-//	      }
-//	      myChassisPose.currentColumn += round(sin(headingInRadians));
 	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
 	    }
 	    //Serial.println("Line Count: " + String(lineCount));

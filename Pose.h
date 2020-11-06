@@ -20,6 +20,10 @@ class Pose{
 	   float initialHeading = -90;
 	   int rowCount = 0;
 	   int colCount = 0;
+
+	   /**
+	    * gets the orientation to the closest ordinal direction (0,90,180,-90)
+	    */
        int getOrientationToClosest90();
     private:
 };

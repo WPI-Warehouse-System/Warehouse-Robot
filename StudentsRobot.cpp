@@ -102,7 +102,7 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
  * update the state machine for running the final project code here
  */
 void StudentsRobot::updateStateMachine() {
-	digitalWrite(WII_CONTROLLER_DETECT, 1);
+//	digitalWrite(WII_CONTROLLER_DETECT, 1);
 	long now = millis();
 	switch (status) {
 	case StartupRobot:
@@ -184,7 +184,6 @@ void StudentsRobot::updateStateMachine() {
 		    case SETTING_NAV_GOAL:
 		    	//Serial.println("SETTING NAV GOAL TO: " + String(goalRow) + " " + String(goalColumn));
 			    navigation.setNavGoal(goalRow, goalColumn);
-			    navigationStatus = NAVIGATING;
 			    navigationStatus = CHECKING_IF_PARKED;
 			    break;
 
@@ -415,7 +414,7 @@ void StudentsRobot::updateStateMachine() {
     break;
 
 	}
-	digitalWrite(WII_CONTROLLER_DETECT, 0);
+//	digitalWrite(WII_CONTROLLER_DETECT, 0);
 }
 
 
