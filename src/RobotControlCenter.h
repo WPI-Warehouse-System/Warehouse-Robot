@@ -35,6 +35,9 @@
 #include "commands/GetPIDVelocity.h"
 #include "commands/IRCamSimplePacketComsServer.h"
 #include "commands/GetIMU.h"
+#include "commands/GetStatus.h"
+#include "commands/SetNavGoal.h"
+#include "commands/SetParkCommand.h"
 
 
 enum state_t {

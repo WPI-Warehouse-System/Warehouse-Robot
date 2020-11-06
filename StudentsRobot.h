@@ -13,10 +13,10 @@
 #include "src/pid/HBridgeEncoderPIDMotor.h"
 #include "src/pid/ServoAnalogPIDMotor.h"
 #include <ESP32Servo.h>
-#include "NavigationRoutine.h"
-
 #include "DrivingChassis.h"
 #include "LineFollower.h"
+#include "Navigation.h"
+#include "Parking.h"
 #include "Pose.h"
 #include "src/commands/IRCamSimplePacketComsServer.h"
 #include "src/commands/GetIMU.h"
@@ -27,8 +27,8 @@
  * Feel free to add ot remove values from here
  */
 enum RobotStateMachine {
-	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4,WAIT_FOR_MOTORS_TO_FINNISH=5,WAIT_FOR_TIME=6,
-	Testing = 7,
+	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
+	Testing = 7, Navigating = 8, ParkingRobot = 9,
 
 };
 /**
@@ -54,6 +54,25 @@ enum ComStackStatusState {
 };
 
 /**
+ * @enum ParkingStates
+ */
+enum ParkingStates {
+	SETTING_PARKING_GOAL = 0,
+	GOING_TO_PARKING_SPACE = 1,
+	PARKING = 2,
+};
+
+/**
+ * @enum NavigatingStates
+ */
+enum NavigatingStates {
+	CHECKING_IF_PARKED = 0,
+	LEAVING_PARKING_SPOT = 1,
+	SETTING_NAV_GOAL = 2,
+	NAVIGATING = 3,
+};
+
+/**
  * @class StudentsRobot
  */
 class StudentsRobot {
@@ -63,7 +82,6 @@ private:
 	PIDMotor * motor3;
 	Servo * servo;
 	DrivingChassis robotChassis;
-	LineFollower lineSensor;
 	float lsensorVal=0;
 	float rsensorVal=0;
 	long nextTime =0;
@@ -71,7 +89,9 @@ private:
 	RobotStateMachine nextStatus = StartupRobot;
 	IRCamSimplePacketComsServer * IRCamera;
 	GetIMU * IMU;
+	LineFollower* lineSensor;
 public:
+	bool robotParked = false;
 	/**
 	 * Constructor for StudentsRobot
 	 *
@@ -90,14 +110,24 @@ public:
 	 *
 	 * this is sent upstream to the Java GUI to notify it of current state
 	 */
-	ComStackStatusState myCommandsStatus = Ready_for_new_task;
+	ComStackStatusState myCommandsStatus = Picking_up;
 	/**
 	 * This is internal data representing the runtime status of the robot for use in its state machine
 	 */
 	RobotStateMachine status = StartupRobot;
 
-	NavigationStates navState = INITIALIZE_NAVIGATION;
+	// This is the status to run to after navigation. Initialize to Running
+	RobotStateMachine statusAfterNav = Running;
 
+	// State variables for the enumeration of different routines. Initialized to first case
+	ParkingStates parkingStatus = SETTING_PARKING_GOAL;
+	NavigatingStates navigationStatus = SETTING_NAV_GOAL;
+
+	// Objects for different routines robot is capable of
+	Navigation navigation;
+	Parking parking;
+
+	// goal column and goal row for navigation from a UI command
 	int goalColumn = -2;
 	int goalRow = 2;
 

@@ -12,7 +12,8 @@ uint32_t startTime = 0;
 
 StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 		PIDMotor * motor3, Servo * servo, IRCamSimplePacketComsServer * IRCam,
-		GetIMU * imu): robotChassis(motor2, motor1, 230, 30, imu), lineSensor(&robotChassis) {
+		GetIMU * imu): robotChassis(motor2, motor1, 230, 30, imu),
+				       navigation(&robotChassis), parking(&robotChassis) {
 	Serial.println("StudentsRobot::StudentsRobot constructor called here ");
 
 	this->servo = servo;
@@ -21,6 +22,7 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 	this->motor3 = motor3;
 	IRCamera = IRCam;
 	IMU = imu;
+
 #if defined(USE_IMU)
 	IMU->setXPosition(200);
 	IMU->setYPosition(0);
@@ -100,7 +102,7 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
  * update the state machine for running the final project code here
  */
 void StudentsRobot::updateStateMachine() {
-	digitalWrite(WII_CONTROLLER_DETECT, 1);
+//	digitalWrite(WII_CONTROLLER_DETECT, 1);
 	long now = millis();
 	switch (status) {
 	case StartupRobot:
@@ -176,14 +178,80 @@ void StudentsRobot::updateStateMachine() {
 	case Halt:
 		// in safe mode
 		break;
+
+	case Navigating:
+		switch(navigationStatus){
+		    case SETTING_NAV_GOAL:
+		    	//Serial.println("SETTING NAV GOAL TO: " + String(goalRow) + " " + String(goalColumn));
+			    navigation.setNavGoal(goalRow, goalColumn);
+			    navigationStatus = CHECKING_IF_PARKED;
+			    break;
+
+			case CHECKING_IF_PARKED:
+				//Serial.println("CHECKING IF PARKED");
+				if(robotParked){
+					//Serial.println("PARKED");
+					navigationStatus = LEAVING_PARKING_SPOT;
+				}
+				else{
+					//Serial.println("NOT PARKED");
+					navigationStatus = NAVIGATING;
+				}
+				break;
+
+			case LEAVING_PARKING_SPOT:
+				if(parking.getOutOfParkingStatus() == FINISHED_EXIT_PARKING){
+					navigationStatus = NAVIGATING;
+					robotParked = false;
+					Serial.println("LEFT PARKING SPOT");
+					Serial.println("NAVIGATING");
+				}
+				break;
+
+			case NAVIGATING:
+				if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
+					navigationStatus = SETTING_NAV_GOAL;
+					//Serial.println("FINISHED NAVIGATION");
+					status = statusAfterNav;
+				}
+				break;
+			}
+//		if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
+//			status = statusAfterNav;
+//		}
+		break;
+
+	case ParkingRobot:
+	    switch(parkingStatus){
+	    case SETTING_PARKING_GOAL:
+	    	parkingStatus = GOING_TO_PARKING_SPACE;
+	    	navigation.setNavGoal(goalRow, goalColumn);
+	    	break;
+	    case GOING_TO_PARKING_SPACE:
+	    	status = Navigating;
+	    	parkingStatus = PARKING;
+	    	statusAfterNav = ParkingRobot;
+	       break;
+	    case PARKING:
+	    	if(parking.checkParkingStatus() == FINISHED_PARKING){
+		    	parkingStatus = SETTING_PARKING_GOAL;
+		    	status = Running;
+		    	statusAfterNav = Running;
+                robotParked = true;
+	    	}
+	    	break;
+	    }
+		break;
+
 	case Testing:
+		myCommandsStatus = Ready_for_new_task;
 /// LINE FOLLOWING
 //	    if((millis() - startTime) < 7000){
-//			lineSensor.lineFollowForwards();
+//			robotChassis.lineFollowForwards();
 //		}
 //		else{
 //		   robotChassis.stop();
-//		   lineSensor.resetLineCount();
+//		   robotChassis.lineSensor.resetLineCount();
 //		   status = Running;
 //		}
 
@@ -193,30 +261,121 @@ void StudentsRobot::updateStateMachine() {
 		switch(myCase){
 			case 1:
 				// set a waypoint
-				setNavGoal(2, -2, &robotChassis, &lineSensor);
+				navigation.setNavGoal(2, 0);
 				// set the state to go to after the waypoint is reached
 				myCaseAfterNav = 2;
 				// set the state
-				myCase = 4;
+				myCase = 10;
 				 break;
 			case 2:
                 // set a waypoint
-				setNavGoal(0, 0, &robotChassis, &lineSensor);
+				navigation.setNavGoal(2, -1);
 				// set the state to go to after the waypoint is reached
 				myCaseAfterNav = 3;
 				// set the state
-				myCase = 4;
+				myCase = 10;
 				 break;
 			case 3:
+                // set a waypoint
+				navigation.setNavGoal(2, -2);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 4;
+				// set the state
+				myCase = 10;
+				 break;
+			case 4:
+                // set a waypoint
+				navigation.setNavGoal(2, -1);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 5;
+				// set the state
+				myCase = 10;
+				break;
+			case 5:
+                // set a waypoint
+				navigation.setNavGoal(2, 0);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 6;
+				// set the state
+				myCase = 10;
+				break;
+			case 6:
+                // set a waypoint
+				navigation.setNavGoal(1, 0);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 7;
+				// set the state
+				myCase = 10;
+				break;
+			case 7:
+                // set a waypoint
+				navigation.setNavGoal(1, -1);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 8;
+				// set the state
+				myCase = 10;
+				break;
+			case 8:
+                // set a waypoint
+				navigation.setNavGoal(1, -2);
+				// set the state to go to after the waypoint is reached
+				myCaseAfterNav = 9;
+				// set the state
+				myCase = 10;
+				break;
+			case 9:
 				 myCase = 1;
 				 status = Running;
 				 break;
-			case 4:
-				 if(checkNavStatus() == FINISHED){
+			case 10:
+				 if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
 					 myCase = myCaseAfterNav;
 				 }
 				 break;
 		}
+// PARKING
+
+// working
+//		static int myCase = 1;
+//		static int myCaseAfterNav = 2;
+//		switch(myCase){
+//			case 1:
+//				// set a waypoint
+//				navigation.setNavGoal(2, 0);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 2;
+//				// set the state
+//				myCase = 5;
+//				 break;
+//			case 2:
+//                 if(parking.checkParkingStatus() == FINISHED_PARKING){
+//                	 myCase = 3;
+//                 }
+//				 break;
+//			case 3:
+//				if(parking.getOutOfParkingStatus() == FINISHED_EXIT_PARKING){
+//				     myCase = 4;
+//				 }
+//				 break;
+//			case 4:
+//				// set a waypoint
+//				navigation.setNavGoal(1, -2);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 6;
+//				// set the state
+//				myCase = 5;
+//				break;
+//			case 5:
+//				 if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
+//					 myCase = myCaseAfterNav;
+//				 }
+//				 break;
+//			case 6:
+//				myCase = 1;
+//				status = Running;
+//				break;
+//		}
+
 // BASIC MOTION
 //
 //	static int myCase = 1;
@@ -255,7 +414,7 @@ void StudentsRobot::updateStateMachine() {
     break;
 
 	}
-	digitalWrite(WII_CONTROLLER_DETECT, 0);
+//	digitalWrite(WII_CONTROLLER_DETECT, 0);
 }
 
 

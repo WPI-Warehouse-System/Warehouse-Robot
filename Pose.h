@@ -7,17 +7,24 @@
 #ifndef POSE_H_
 #define POSE_H_
 
+#define PI 3.14159265f
+
 class Pose{
     public:
 	   Pose();
 	   // current row and current column will be updated by the line sensor lineCount
-	   int currentRow = 0;
-	   int currentColumn = 0;
+	   int currentRow = 1;
+	   int currentColumn = -2;
 	   // current heading will be updated by the IMU during turnToHeading.
-	   float heading = 0;
+	   float currentHeading = 0;
+	   float initialHeading = -90;
 	   int rowCount = 0;
 	   int colCount = 0;
 
+	   /**
+	    * gets the orientation to the closest ordinal direction (0,90,180,-90)
+	    */
+       int getOrientationToClosest90();
     private:
 };
 

@@ -124,7 +124,6 @@ void RobotControlCenter::setup() {
 	myDFRobotIRPosition.begin();
 	serverIR = new IRCamSimplePacketComsServer(&myDFRobotIRPosition);
 #endif
-
 	robot = new StudentsRobot(&motor1, &motor2, &motor3, &servo, serverIR,
 			sensor);
 
@@ -146,6 +145,12 @@ void RobotControlCenter::setup() {
 	coms.attach(new GetPDVelocityConstants(numberOfPID, pidList));
 	coms.attach(new SetPIDVelocity(numberOfPID, pidList));
 	coms.attach(new SetPDVelocityConstants(numberOfPID, pidList));
+	// Get the status of the robot
+	coms.attach(new GetStatus(robot));// @suppress("Method cannot be resolved")
+	// GettingNavGoals
+    coms.attach(new SetNavGoal(robot));// @suppress("Method cannot be resolved")
+    // Setting parking command
+    coms.attach(new SetParkCommand(robot));// @suppress("Method cannot be resolved")
 
 #endif
 
@@ -188,7 +193,10 @@ void RobotControlCenter::fastLoop() {
 		return;
 	}
 #endif
-	//uint32_t startTime = micros();
+//	unsigned long  startTime = micros();
 	robot->updateStateMachine();
-	//Serial.println("Time Taken: "  + String(micros() - startTime) + "\r\n" );
+//	if((micros() - startTime) >= 75){
+//	    Serial.println("Time Taken: "  + String(micros() - startTime) + "\r\n" );
+//	}
+
 }

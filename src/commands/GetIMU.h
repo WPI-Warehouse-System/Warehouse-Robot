@@ -57,6 +57,7 @@ public:
 	float getGRAVITY_Y();
 	float getGRAVITY_Z();
 	float getEULER_azimuth();
+	float getWrappedAzimuth();
 	float getEULER_elevation();
 	float getEULER_tilt();
 

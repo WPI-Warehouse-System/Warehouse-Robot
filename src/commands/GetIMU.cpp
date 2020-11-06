@@ -65,7 +65,7 @@ boolean GetIMU::loop() {
 		}
 		firstRotationRead = false;
 		lastRotation = az;
-		bufferINTERNAL[11] =az + absoluteRotation;
+		bufferINTERNAL[11] = az + absoluteRotation;
 
 	}
 	updateIndex++;
@@ -130,7 +130,18 @@ float GetIMU::getEULER_elevation() {
 float GetIMU::getEULER_tilt() {
 	return bufferINTERNAL[9];
 }
-
+float GetIMU::getWrappedAzimuth(){
+	float orientation = getEULER_azimuth();
+	if(fabs(orientation) > 360){
+		if(orientation > 360){
+			orientation -= 360;
+		}
+		else{
+			orientation += 360;
+		}
+	}
+	return orientation;
+}
 void GetIMU::startSensor(Adafruit_BNO055 * _bno) {
 
 	bno = _bno;
