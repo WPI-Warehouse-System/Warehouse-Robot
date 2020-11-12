@@ -18,6 +18,7 @@
 #include "Navigation.h"
 #include "Parking.h"
 #include "Pose.h"
+#include "LiftControl.h"
 #include "src/commands/IRCamSimplePacketComsServer.h"
 #include "src/commands/GetIMU.h"
 
@@ -28,7 +29,7 @@
  */
 enum RobotStateMachine {
 	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
-	Testing = 7, Navigating = 8, ParkingRobot = 9,
+	Testing = 7, Navigating = 8, ParkingRobot = 9, HomingLift = 10, MovingLift = 11
 
 };
 /**
@@ -72,6 +73,21 @@ enum NavigatingStates {
 	NAVIGATING = 3,
 };
 
+enum HomingLiftStates {
+	STARTINGHOME = 0,
+	MOVINGTOLOWERLIMIT = 1,
+	MOVINGTOUPPERLIMIT = 2,
+	DONEHOMING = 3
+
+};
+
+enum MovingLiftStates {
+	SETLIFTHEIGHT = 0,
+	WAITFORHEIGHTREACHED = 1,
+	DONELIFTING = 2
+};
+
+
 /**
  * @class StudentsRobot
  */
@@ -89,8 +105,8 @@ private:
 	RobotStateMachine nextStatus = StartupRobot;
 	IRCamSimplePacketComsServer * IRCamera;
 	GetIMU * IMU;
-	LineFollower* lineSensor;
 public:
+	float liftHeight = 0;//In mm
 	bool robotParked = false;
 	/**
 	 * Constructor for StudentsRobot
@@ -123,9 +139,15 @@ public:
 	ParkingStates parkingStatus = SETTING_PARKING_GOAL;
 	NavigatingStates navigationStatus = SETTING_NAV_GOAL;
 
+	HomingLiftStates homeLiftState = DONEHOMING;
+
+	MovingLiftStates moveLiftState = DONELIFTING;
+
+
 	// Objects for different routines robot is capable of
 	Navigation navigation;
 	Parking parking;
+	LiftControl Lift;
 
 	// goal column and goal row for navigation from a UI command
 	int goalColumn = -2;

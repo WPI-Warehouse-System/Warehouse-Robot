@@ -98,13 +98,14 @@ protected:
 	 */
 	float myFmap(float x, float in_min, float in_max, float out_min,
 			float out_max);
-	/**
-	 * Get the setpoint
-	 *
-	 * @return the setpoint in sensor "Ticks"
-	 */
-	float getSetPoint();
+
 public:
+	/**
+		 * Get the setpoint
+		 *
+		 * @return the setpoint in sensor "Ticks"
+		 */
+	float getSetPoint();//Warehouse robot needs this public for the lift mechanism
 	/**
 	 * The value that is being sent to the hardware
 	 *

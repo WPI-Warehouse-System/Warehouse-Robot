@@ -10,6 +10,7 @@
 
 #include <SimplePacketComs.h>
 #include "../../StudentsRobot.h"
+
 class SetNavGoal: public PacketEventAbstract {
 	StudentsRobot* robotPointer;
 public:

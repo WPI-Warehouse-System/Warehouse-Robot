@@ -13,7 +13,7 @@ uint32_t startTime = 0;
 StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 		PIDMotor * motor3, Servo * servo, IRCamSimplePacketComsServer * IRCam,
 		GetIMU * imu): robotChassis(motor2, motor1, 230, 30, imu),
-				       navigation(&robotChassis), parking(&robotChassis) {
+				       navigation(&robotChassis), parking(&robotChassis), Lift(motor3) {
 	Serial.println("StudentsRobot::StudentsRobot constructor called here ");
 
 	this->servo = servo;
@@ -74,12 +74,12 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 			0, //the value of the output to stop moving
 			125, //a positive value subtracted from stop value to creep backward
 			125, //a positive value added to the stop value to creep forwards
-			16.0 * // Encoder CPR
-					50.0 * // Motor Gear box ratio
+			64.0 * // Encoder CPR
+					6.3 * // Motor Gear box ratio
 					1.0 * // motor to arm stage ratio
 					(1.0 / 360.0) * // degrees per revolution
 					2, // Number of edges that are used to increment the value
-			1400, // measured max degrees per second
+			4800, // measured max degrees per second
 			50 // the speed in degrees per second that the motor spins when the hardware output is at creep forwards
 			);
 	// Set up the Analog sensors
@@ -90,12 +90,13 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 	// H-Bridge enable pin
 	pinMode(H_BRIDGE_ENABLE, OUTPUT);
 	// Stepper pins
-	pinMode(STEPPER_DIRECTION, OUTPUT);
-	pinMode(STEPPER_STEP, OUTPUT);
+	pinMode(BOTTOM_OPTICALSWITCH, INPUT);
+	pinMode(TOP_OPTICALSWITCH, INPUT);
+	pinMode(CLEAT_LIMIT_SWITCH, INPUT_PULLUP);
 	// User button
 	pinMode(BOOT_FLAG_PIN, INPUT_PULLUP);
 	//Test IO
-	pinMode(WII_CONTROLLER_DETECT, OUTPUT);
+	//pinMode(WII_CONTROLLER_DETECT, OUTPUT);
 }
 /**
  * Seperate from running the motor control,
@@ -104,6 +105,12 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 void StudentsRobot::updateStateMachine() {
 //	digitalWrite(WII_CONTROLLER_DETECT, 1);
 	long now = millis();
+	//Serial.println("Limit Switches");
+	//Serial.println(digitalRead(CLEAT_LIMIT_SWITCH));
+	//Serial.println(digitalRead(BOTTOM_OPTICALSWITCH));
+	//Serial.println(digitalRead(TOP_OPTICALSWITCH));
+	//delay(100);
+
 	switch (status) {
 	case StartupRobot:
 		//Do this once at startup
@@ -256,6 +263,7 @@ void StudentsRobot::updateStateMachine() {
 //		}
 
 // Navigation
+
 		static int myCase = 1;
 		static int myCaseAfterNav = 2;
 		switch(myCase){
@@ -412,6 +420,52 @@ void StudentsRobot::updateStateMachine() {
 //	}
 
     break;
+    case HomingLift:
+    	switch(homeLiftState){
+    	case STARTINGHOME:
+    		Lift.StartHomeDown();
+    		homeLiftState = MOVINGTOLOWERLIMIT;
+    		break;
+    	case MOVINGTOLOWERLIMIT:
+    		if(Lift.CheckIfAtBottom()){
+    			Lift.StartHomeUp();
+    			homeLiftState = MOVINGTOUPPERLIMIT;
+    		}
+    		break;
+    	case MOVINGTOUPPERLIMIT:
+    		if(Lift.CheckIfAtTop()){
+    			liftHeight = 0;
+    			moveLiftState = SETLIFTHEIGHT;
+    			homeLiftState = DONEHOMING;
+    		}
+    		break;
+    	case DONEHOMING:
+    		status = MovingLift;
+    		break;
+    	}
+	break;
+
+	case MovingLift:
+		switch(moveLiftState){
+		case SETLIFTHEIGHT:
+			if(Lift.SetLiftHeight(liftHeight)){//if the lift is not homed this will not run
+				moveLiftState = WAITFORHEIGHTREACHED;
+			}
+			else{
+				moveLiftState = DONELIFTING;
+			}
+			break;
+		case WAITFORHEIGHTREACHED:
+			if(Lift.CheckIfPositionReached()){
+				moveLiftState= DONELIFTING;
+			}
+			break;
+		case DONELIFTING:
+			Serial.println("Done Move");
+			status = Running;
+			break;
+		}
+	break;
 
 	}
 //	digitalWrite(WII_CONTROLLER_DETECT, 0);
