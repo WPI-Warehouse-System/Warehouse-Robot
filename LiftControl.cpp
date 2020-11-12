@@ -75,8 +75,8 @@ bool LiftControl::SetLiftHeight(float mm){
 }
 
 bool LiftControl::CheckIfPositionReached(){
-	if(liftMotor->getPosition()<targetLiftHeightTicks+5 && liftMotor->getPosition()>targetLiftHeightTicks-5){
-		liftMotor->SetTunings(0.0, 0.0, 0.0);
+	if(liftMotor->getPosition()<targetLiftHeightTicks+1 && liftMotor->getPosition()>targetLiftHeightTicks-1){
+		liftMotor->SetTunings(0.015, 0.0, 0.0);
 		return true;
 	}
 	else{
