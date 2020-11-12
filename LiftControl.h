@@ -27,7 +27,7 @@ public:
 
 private:
 	bool Homed = false;
-	float mmOfMovement = 220;//measured distance of travel
+	float mmOfMovement = 217;//measured distance of travel
 	float ticksOfMovement;
 	float ticksPerMM;
 	int64_t targetLiftHeightTicks = 0;
