@@ -51,11 +51,11 @@
 #define MOTOR3_DIR 26
 
 //Encoder pins
-#define MOTOR1_ENCA 18
-#define MOTOR1_ENCB 19
+#define MOTOR1_ENCA 18 // Gabe's is 19
+#define MOTOR1_ENCB 19 // Gabe's is 18
 
-#define MOTOR2_ENCA 16
-#define MOTOR2_ENCB 17
+#define MOTOR2_ENCA 16 // Gabe's is 17
+#define MOTOR2_ENCB 17 // Gabe's is 16
 
 #define MOTOR3_ENCB 25
 #define MOTOR3_ENCA 14
