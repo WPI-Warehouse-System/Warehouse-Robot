@@ -19,7 +19,7 @@ SetLiftHeight::~SetLiftHeight() {
 void SetLiftHeight::event(float * buffer) {
 	Serial.println("Recieved Moving Command");
 	robotPointer->liftHeight = buffer[0];
-	robotPointer -> status = MovingLift;
-	robotPointer -> moveLiftState = SETLIFTHEIGHT;
+	robotPointer -> status = MovingLiftFromGUI;
+	robotPointer -> moveLiftState = SET_LIFT_HEIGHT;
 }
 

@@ -13,7 +13,7 @@ uint32_t startTime = 0;
 StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 		PIDMotor * motor3, Servo * servo, IRCamSimplePacketComsServer * IRCam,
 		GetIMU * imu): robotChassis(motor2, motor1, 230, 30, imu),
-				       navigation(&robotChassis), parking(&robotChassis), Lift(motor3) {
+				       navigation(&robotChassis), parking(&robotChassis), Lift(motor3), binHandler(&robotChassis, &Lift) {
 	Serial.println("StudentsRobot::StudentsRobot constructor called here ");
 
 	this->servo = servo;
@@ -250,6 +250,103 @@ void StudentsRobot::updateStateMachine() {
 	    }
 		break;
 
+	case DeliveringBin:
+		switch(binDeliveryStatus){
+			case SETTING_DELIVERY_LOCATION:
+		    	binDeliveryStatus = GOING_TO_BIN;
+		    	navigation.setNavGoal(goalRow, goalColumn);
+		    	binHandler.setBinHeight(goalShelf);
+				break;
+			case GOING_TO_BIN:
+		    	status = Navigating;
+		    	binDeliveryStatus = PROCURING_BIN;
+		    	statusAfterNav = DeliveringBin;
+				break;
+			case PROCURING_BIN:
+				if(binHandler.checkBinProcurementStatus() == FINISHED_PROCUREMENT){
+			    	binDeliveryStatus = GOING_TO_USER;
+			    	navigation.setNavGoal(0, 0); // replace with coordinates of designated drop off
+			    	status = Navigating;
+			    	statusAfterNav = DeliveringBin;
+				}
+				break;
+			case GOING_TO_USER:
+				status = Running;
+				// TODO: send communication to GUI that bin is delivered
+				binDeliveryStatus = SETTING_DELIVERY_LOCATION;
+				break;
+		}
+		break;
+
+	case ReturningBin:
+		switch(binReturnStatus){
+			case SETTING_RETURN_LOCATION:
+				binReturnStatus = GOING_TO_SHELF;
+			    navigation.setNavGoal(goalRow, goalColumn);
+			    binHandler.setBinHeight(goalShelf);
+				break;
+			case GOING_TO_SHELF:
+		    	status = Navigating;
+		    	binReturnStatus = RETURNING_BIN;
+		    	statusAfterNav = ReturningBin;
+				break;
+			case RETURNING_BIN:
+				if(binHandler.checkBinReturnStatus() == FINISHED_RETURN){
+			    	binReturnStatus = SETTING_RETURN_LOCATION;
+			    	// TODO: send communication to GUI that bin is returned
+			    	status = Running;
+				}
+				break;
+		}
+		break;
+
+	case HomingLift:
+		switch(homeLiftState){
+		case STARTING_HOME:
+			Lift.StartHomeDown();
+			homeLiftState = MOVING_TO_LOWER_LIMIT;
+			break;
+		case MOVING_TO_LOWER_LIMIT:
+			if(Lift.CheckIfAtBottom()){
+				Lift.StartHomeUp();
+				homeLiftState = MOVING_TO_UPPER_LIMIT;
+			}
+			break;
+		case MOVING_TO_UPPER_LIMIT:
+			if(Lift.CheckIfAtTop()){
+				liftHeight = 0;
+				moveLiftState = SET_LIFT_HEIGHT;
+				homeLiftState = DONE_HOMING;
+			}
+			break;
+		case DONE_HOMING:
+			status = MovingLiftFromGUI;
+			break;
+		}
+	break;
+
+	case MovingLiftFromGUI:
+		switch(moveLiftState){
+		case SET_LIFT_HEIGHT:
+			if(Lift.SetLiftHeight(liftHeight)){//if the lift is not homed this will not run
+				moveLiftState = WAIT_FOR_HEIGHT_REACHED;
+			}
+			else{
+				moveLiftState = DONE_LIFTING;
+			}
+			break;
+		case WAIT_FOR_HEIGHT_REACHED:
+			if(Lift.CheckIfPositionReached()){
+				moveLiftState= DONE_LIFTING;
+			}
+			break;
+		case DONE_LIFTING:
+			Serial.println("Done Move");
+			status = Running;
+			break;
+		}
+	break;
+
 	case Testing:
 		myCommandsStatus = Ready_for_new_task;
 /// LINE FOLLOWING
@@ -420,52 +517,6 @@ void StudentsRobot::updateStateMachine() {
 //	}
 
     break;
-    case HomingLift:
-    	switch(homeLiftState){
-    	case STARTINGHOME:
-    		Lift.StartHomeDown();
-    		homeLiftState = MOVINGTOLOWERLIMIT;
-    		break;
-    	case MOVINGTOLOWERLIMIT:
-    		if(Lift.CheckIfAtBottom()){
-    			Lift.StartHomeUp();
-    			homeLiftState = MOVINGTOUPPERLIMIT;
-    		}
-    		break;
-    	case MOVINGTOUPPERLIMIT:
-    		if(Lift.CheckIfAtTop()){
-    			liftHeight = 0;
-    			moveLiftState = SETLIFTHEIGHT;
-    			homeLiftState = DONEHOMING;
-    		}
-    		break;
-    	case DONEHOMING:
-    		status = MovingLift;
-    		break;
-    	}
-	break;
-
-	case MovingLift:
-		switch(moveLiftState){
-		case SETLIFTHEIGHT:
-			if(Lift.SetLiftHeight(liftHeight)){//if the lift is not homed this will not run
-				moveLiftState = WAITFORHEIGHTREACHED;
-			}
-			else{
-				moveLiftState = DONELIFTING;
-			}
-			break;
-		case WAITFORHEIGHTREACHED:
-			if(Lift.CheckIfPositionReached()){
-				moveLiftState= DONELIFTING;
-			}
-			break;
-		case DONELIFTING:
-			Serial.println("Done Move");
-			status = Running;
-			break;
-		}
-	break;
 
 	}
 //	digitalWrite(WII_CONTROLLER_DETECT, 0);

@@ -19,6 +19,7 @@
 #include "Parking.h"
 #include "Pose.h"
 #include "LiftControl.h"
+#include "BinHandling.h"
 #include "src/commands/IRCamSimplePacketComsServer.h"
 #include "src/commands/GetIMU.h"
 
@@ -29,7 +30,7 @@
  */
 enum RobotStateMachine {
 	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
-	Testing = 7, Navigating = 8, ParkingRobot = 9, HomingLift = 10, MovingLift = 11
+	Testing = 7, Navigating = 8, ParkingRobot = 9, DeliveringBin = 10, ReturningBin = 11, HomingLift = 12, MovingLiftFromGUI = 13
 
 };
 /**
@@ -73,18 +74,38 @@ enum NavigatingStates {
 	NAVIGATING = 3,
 };
 
+/**
+ * @enum BinDeliveryStates
+ */
+enum BinDeliveryStates {
+	SETTING_DELIVERY_LOCATION = 0,
+	GOING_TO_BIN = 1,
+	PROCURING_BIN = 2,
+	GOING_TO_USER = 3,
+};
+
+/**
+ * @enum BinReturnStates
+ */
+enum BinReturnStates {
+	SETTING_RETURN_LOCATION = 0,
+	GOING_TO_SHELF = 1,
+	RETURNING_BIN = 2,
+};
+
+
 enum HomingLiftStates {
-	STARTINGHOME = 0,
-	MOVINGTOLOWERLIMIT = 1,
-	MOVINGTOUPPERLIMIT = 2,
-	DONEHOMING = 3
+	STARTING_HOME = 0,
+	MOVING_TO_LOWER_LIMIT = 1,
+	MOVING_TO_UPPER_LIMIT = 2,
+	DONE_HOMING = 3
 
 };
 
-enum MovingLiftStates {
-	SETLIFTHEIGHT = 0,
-	WAITFORHEIGHTREACHED = 1,
-	DONELIFTING = 2
+enum MovingLiftFromGUIStates {
+	SET_LIFT_HEIGHT = 0,
+	WAIT_FOR_HEIGHT_REACHED = 1,
+	DONE_LIFTING = 2
 };
 
 
@@ -137,21 +158,30 @@ public:
 
 	// State variables for the enumeration of different routines. Initialized to first case
 	ParkingStates parkingStatus = SETTING_PARKING_GOAL;
+
 	NavigatingStates navigationStatus = SETTING_NAV_GOAL;
 
-	HomingLiftStates homeLiftState = DONEHOMING;
+	BinDeliveryStates binDeliveryStatus = SETTING_DELIVERY_LOCATION;
 
-	MovingLiftStates moveLiftState = DONELIFTING;
+	BinReturnStates binReturnStatus = SETTING_RETURN_LOCATION;
+
+	HomingLiftStates homeLiftState = DONE_HOMING;
+
+	MovingLiftFromGUIStates moveLiftState = DONE_LIFTING;
+
+
 
 
 	// Objects for different routines robot is capable of
 	Navigation navigation;
 	Parking parking;
 	LiftControl Lift;
+	BinHandling binHandler;
 
 	// goal column and goal row for navigation from a UI command
 	int goalColumn = -2;
 	int goalRow = 2;
+	int goalShelf = 2;
 
 
 

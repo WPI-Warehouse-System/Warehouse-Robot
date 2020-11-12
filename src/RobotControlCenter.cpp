@@ -153,6 +153,8 @@ void RobotControlCenter::setup() {
     coms.attach(new SetParkCommand(robot));// @suppress("Method cannot be resolved")
     coms.attach(new SetStartLiftHoming(robot));
     coms.attach(new SetLiftHeight(robot));
+    coms.attach(new SetBinDeliveryCommand(robot));// @suppress("Method cannot be resolved")
+    coms.attach(new SetBinReturnCommand(robot));// @suppress("Method cannot be resolved")
 
 #endif
 

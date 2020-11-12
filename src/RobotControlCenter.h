@@ -37,6 +37,8 @@
 #include "commands/GetIMU.h"
 #include "commands/GetStatus.h"
 #include "commands/SetNavGoal.h"
+#include "commands/SetBinDeliveryCommand.h"
+#include "commands/SetBinReturnCommand.h"
 #include "commands/SetParkCommand.h"
 #include "commands/SetStartLiftHoming.h"
 #include "commands/SetLiftHeight.h"

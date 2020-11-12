@@ -19,6 +19,6 @@ SetStartLiftHoming::~SetStartLiftHoming() {
 void SetStartLiftHoming::event(float * buffer) {
 	Serial.println("Recieved Homing Command");
 	robotPointer -> status = HomingLift;
-	robotPointer -> homeLiftState = STARTINGHOME;
+	robotPointer -> homeLiftState = STARTING_HOME;
 
 }
