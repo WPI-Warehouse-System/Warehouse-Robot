@@ -17,11 +17,15 @@
  * @enum BinProcurementStates
  * States used in the Bin procurement state machine, not the main robot state machine
 */
+
+// TODO: Need to align with bin before turning
 enum BinProcurementRoutineStates{
+	ALIGN_WITH_BIN,
 	TURN_TO_BIN,
 	RAISE_LIFT_TO_SHELF,
 	APPROACH_BIN,
 	GRAB_BIN,
+	BACK_AWAY_FROM_SHELF_PROCUREMENT,
 	BACK_UP_TO_WORLD_PROCUREMENT,
 	LOWER_BIN,
 	FINISHED_PROCUREMENT,
@@ -35,10 +39,12 @@ enum BinProcurementRoutineStates{
  * States used in the bin return state machine, not the main robot state machine
 */
 enum BinReturnRoutineStates{
+	ALIGN_WITH_SHELF,
 	TURN_TO_SHELF,
 	RAISE_BIN_TO_SHELF,
 	APPROACH_SHELF,
 	PLACE_BIN_ON_SHELF,
+	BACK_AWAY_FROM_SHELF_RETURN,
 	BACK_UP_TO_WORLD_RETURN,
 	LOWER_LIFT,
 	FINISHED_RETURN,
@@ -71,7 +77,7 @@ class BinHandling{
 	   DrivingChassis* chassis = NULL;
 	   LiftControl* lift = NULL;
 
-	   BinProcurementRoutineStates binProcurementState;
+	   BinProcurementRoutineStates binProcurementState = ALIGN_WITH_BIN;
 
 	   // This is the binProcurementState that occurs after a setpoint has been reached
 	   BinProcurementRoutineStates binProcurementStateAfterMotionSetpointReached;
@@ -80,7 +86,7 @@ class BinHandling{
 	   BinProcurementRoutineStates binProcurementStateAfterLiftSetpointReached;
 
 
-	   BinReturnRoutineStates binReturnState;
+	   BinReturnRoutineStates binReturnState = ALIGN_WITH_SHELF;
 
 	   // This is the binReturnState that occurs after a setpoint has been reached
 	   BinReturnRoutineStates binReturnStateAfterMotionSetpointReached;

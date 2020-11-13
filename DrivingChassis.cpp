@@ -178,7 +178,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 			 // check for timeout
 			 if((millis() - startTimeOfMovement_ms) > timeout_ms){
 					//timeout occured. Stop the robot
-					Serial.println("Detected Timeout\r\n");
+					Serial.println("Detected Timeout on Turn\r\n");
 					//Serial.println("CURRENT HEADING: " + String(myChassisPose.currentHeading));
 					stop();
 					adjustedHeading = false;
@@ -236,7 +236,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    		// check for timeout
 	    		if((millis() - startTimeOfMovement_ms) > timeout_ms){
 	    			//timeout occured. Stop the robot
-	    			Serial.println("Detected Timeout\r\n");
+	    			Serial.println("Detected Timeout on Forwards\r\n");
 	    			stop();
 	    			return TIMED_OUT;
 	    		}
@@ -263,7 +263,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	// check for timeout
 	    		if((millis() - startTimeOfMovement_ms) > timeout_ms){
 	    			//timeout occured. Stop the robot
-	    			Serial.println("Detected Timeout\r\n");
+	    			Serial.println("Detected Timeout on Backwards\r\n");
 	    			stop();
 	    			return TIMED_OUT;
 	    		}
@@ -330,7 +330,7 @@ void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 			headingError += 360;
 		}
 	}
-	float motorEffort = (turningMovementKp) * headingError;
+	float motorEffort = (turningMovementKp) * .75 * headingError;
 
 	if(direction == DRIVING_BACKWARDS){
 		myleft->setVelocityDegreesPerSecond((MAX_SPEED_MM_PER_SEC + motorEffort)*MM_TO_WHEEL_DEGREES);

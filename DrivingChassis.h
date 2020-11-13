@@ -90,14 +90,14 @@ public:
 	PIDMotor * myleft;
 	PIDMotor * myright;
 	bool adjustedHeading = false;
-	MotionType motionType;
+	MotionType motionType = DRIVING_FORWARDS;
 	unsigned long startTimeOfMovement_ms;
 	float wheelMovementKp = 3.5;// was 3.9
 	float turningMovementKp = 21; //was 9, 11.7, 17.5
 	float wheelMovementDeadband_mm = 2.5;
 	float wheelMovementDeadband_deg = .5;
-	float motionSetpoint;
-	float timeout_ms;
+	float motionSetpoint = 0;
+	float timeout_ms = 0;
 	Pose myChassisPose;
 	LineFollower lineSensor;
 

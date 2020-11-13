@@ -21,7 +21,7 @@ void SetBinReturnCommand::event(float * buffer) {
 	robotPointer -> goalRow = (int) row;
 	robotPointer -> goalColumn = (int) column;
 	robotPointer -> goalShelf = (int) shelf;
-	robotPointer -> status = DeliveringBin;
+	robotPointer -> status = ReturningBin;
 
 }
 

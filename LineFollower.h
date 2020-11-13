@@ -21,7 +21,7 @@ class LineFollower{
 	   float lineFollowingKpBackwards = .002*lineFollowingSpeedBackwards_mm_per_sec;
 	   float lineFollowingKpForwards = 1.3; //1.6
 	   int lineCount = 0;
-       bool canCountLine = true;
+       bool canCountLine = false; // so we can start on a line
 
 	   void resetLineCount();
 	   bool onMarker();

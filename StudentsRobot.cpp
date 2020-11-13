@@ -210,8 +210,8 @@ void StudentsRobot::updateStateMachine() {
 				if(parking.getOutOfParkingStatus() == FINISHED_EXIT_PARKING){
 					navigationStatus = NAVIGATING;
 					robotParked = false;
-					Serial.println("LEFT PARKING SPOT");
-					Serial.println("NAVIGATING");
+					//Serial.println("LEFT PARKING SPOT");
+					//Serial.println("NAVIGATING");
 				}
 				break;
 
@@ -281,6 +281,7 @@ void StudentsRobot::updateStateMachine() {
 	case ReturningBin:
 		switch(binReturnStatus){
 			case SETTING_RETURN_LOCATION:
+				//Serial.println("GOT NEW RETURN COMMAND");
 				binReturnStatus = GOING_TO_SHELF;
 			    navigation.setNavGoal(goalRow, goalColumn);
 			    binHandler.setBinHeight(goalShelf);
@@ -294,6 +295,7 @@ void StudentsRobot::updateStateMachine() {
 				if(binHandler.checkBinReturnStatus() == FINISHED_RETURN){
 			    	binReturnStatus = SETTING_RETURN_LOCATION;
 			    	// TODO: send communication to GUI that bin is returned
+				//	Serial.println("FINISHED RETURN, GOING TO RUNNING");
 			    	status = Running;
 				}
 				break;
@@ -359,85 +361,90 @@ void StudentsRobot::updateStateMachine() {
 //		   status = Running;
 //		}
 
+// Bin Return
+		goalRow = 2;
+		goalColumn = -2;
+		goalShelf = 2;
+		status = ReturningBin;
 // Navigation
-
-		static int myCase = 1;
-		static int myCaseAfterNav = 2;
-		switch(myCase){
-			case 1:
-				// set a waypoint
-				navigation.setNavGoal(2, 0);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 2;
-				// set the state
-				myCase = 10;
-				 break;
-			case 2:
-                // set a waypoint
-				navigation.setNavGoal(2, -1);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 3;
-				// set the state
-				myCase = 10;
-				 break;
-			case 3:
-                // set a waypoint
-				navigation.setNavGoal(2, -2);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 4;
-				// set the state
-				myCase = 10;
-				 break;
-			case 4:
-                // set a waypoint
-				navigation.setNavGoal(2, -1);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 5;
-				// set the state
-				myCase = 10;
-				break;
-			case 5:
-                // set a waypoint
-				navigation.setNavGoal(2, 0);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 6;
-				// set the state
-				myCase = 10;
-				break;
-			case 6:
-                // set a waypoint
-				navigation.setNavGoal(1, 0);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 7;
-				// set the state
-				myCase = 10;
-				break;
-			case 7:
-                // set a waypoint
-				navigation.setNavGoal(1, -1);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 8;
-				// set the state
-				myCase = 10;
-				break;
-			case 8:
-                // set a waypoint
-				navigation.setNavGoal(1, -2);
-				// set the state to go to after the waypoint is reached
-				myCaseAfterNav = 9;
-				// set the state
-				myCase = 10;
-				break;
-			case 9:
-				 myCase = 1;
-				 status = Running;
-				 break;
-			case 10:
-				 if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
-					 myCase = myCaseAfterNav;
-				 }
-				 break;
-		}
+//
+//		static int myCase = 1;
+//		static int myCaseAfterNav = 2;
+//		switch(myCase){
+//			case 1:
+//				// set a waypoint
+//				navigation.setNavGoal(2, 0);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 2;
+//				// set the state
+//				myCase = 10;
+//				 break;
+//			case 2:
+//                // set a waypoint
+//				navigation.setNavGoal(2, -1);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 3;
+//				// set the state
+//				myCase = 10;
+//				 break;
+//			case 3:
+//                // set a waypoint
+//				navigation.setNavGoal(2, -2);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 4;
+//				// set the state
+//				myCase = 10;
+//				 break;
+//			case 4:
+//                // set a waypoint
+//				navigation.setNavGoal(2, -1);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 5;
+//				// set the state
+//				myCase = 10;
+//				break;
+//			case 5:
+//                // set a waypoint
+//				navigation.setNavGoal(2, 0);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 6;
+//				// set the state
+//				myCase = 10;
+//				break;
+//			case 6:
+//                // set a waypoint
+//				navigation.setNavGoal(1, 0);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 7;
+//				// set the state
+//				myCase = 10;
+//				break;
+//			case 7:
+//                // set a waypoint
+//				navigation.setNavGoal(1, -1);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 8;
+//				// set the state
+//				myCase = 10;
+//				break;
+//			case 8:
+//                // set a waypoint
+//				navigation.setNavGoal(1, -2);
+//				// set the state to go to after the waypoint is reached
+//				myCaseAfterNav = 9;
+//				// set the state
+//				myCase = 10;
+//				break;
+//			case 9:
+//				 myCase = 1;
+//				 status = Running;
+//				 break;
+//			case 10:
+//				 if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
+//					 myCase = myCaseAfterNav;
+//				 }
+//				 break;
+//		}
 // PARKING
 
 // working
