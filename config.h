@@ -57,8 +57,8 @@
 #define MOTOR2_ENCA 16 // Gabe's is 17
 #define MOTOR2_ENCB 17 // Gabe's is 16
 
-#define MOTOR3_ENCB 25
-#define MOTOR3_ENCA 14
+#define MOTOR3_ENCB 14
+#define MOTOR3_ENCA 25
 
 //Stepper
 //#define STEPPER_DIRECTION 33

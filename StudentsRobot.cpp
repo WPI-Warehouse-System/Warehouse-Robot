@@ -300,7 +300,7 @@ void StudentsRobot::updateStateMachine() {
 				}
 				break;
 		}
-		break;
+	break;
 
 	case HomingLift:
 		switch(homeLiftState){
@@ -323,6 +323,7 @@ void StudentsRobot::updateStateMachine() {
 			break;
 		case DONE_HOMING:
 			status = MovingLiftFromGUI;
+			Serial.println("Done Homing");
 			break;
 		}
 	break;
@@ -332,20 +333,22 @@ void StudentsRobot::updateStateMachine() {
 		case SET_LIFT_HEIGHT:
 			if(Lift.SetLiftHeight(liftHeight)){//if the lift is not homed this will not run
 				moveLiftState = WAIT_FOR_HEIGHT_REACHED;
+				Serial.println("Homed confirmed");
 			}
 			else{
 				moveLiftState = DONE_LIFTING;
+				Serial.println("Not Homed");
 			}
-			break;
+		break;
 		case WAIT_FOR_HEIGHT_REACHED:
 			if(Lift.CheckIfPositionReached()){
 				moveLiftState= DONE_LIFTING;
 			}
-			break;
+		break;
 		case DONE_LIFTING:
 			Serial.println("Done Move");
 			status = Running;
-			break;
+		break;
 		}
 	break;
 

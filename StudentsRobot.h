@@ -30,7 +30,7 @@
  */
 enum RobotStateMachine {
 	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
-	Testing = 7, Navigating = 8, ParkingRobot = 9, DeliveringBin = 10, ReturningBin = 11, HomingLift = 12, MovingLiftFromGUI = 13
+	Testing = 7, Navigating = 8, ParkingRobot = 9, HomingLift = 10, MovingLiftFromGUI = 11,  DeliveringBin = 12, ReturningBin = 13
 
 };
 /**
@@ -165,9 +165,9 @@ public:
 
 	BinReturnStates binReturnStatus = SETTING_RETURN_LOCATION;
 
-	HomingLiftStates homeLiftState = STARTING_HOME;
+	HomingLiftStates homeLiftState = DONE_HOMING;
 
-	MovingLiftFromGUIStates moveLiftState = SET_LIFT_HEIGHT;
+	MovingLiftFromGUIStates moveLiftState = DONE_LIFTING;
 
 
 

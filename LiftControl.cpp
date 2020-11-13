@@ -20,11 +20,11 @@ LiftControl::~LiftControl() {
 }
 void LiftControl::StartHomeDown(){
 	liftMotor->velocityPID.setpid(1, 0, 0);
-	liftMotor->setVelocityDegreesPerSecond(DegreesPerMM*-8);//-2mm/sec for testing
+	liftMotor->setVelocityDegreesPerSecond(DegreesPerMM*-12);//-2mm/sec for testing
 }
 void LiftControl::StartHomeUp(){
 	liftMotor->velocityPID.setpid(1, 0, 0);
-	liftMotor->setVelocityDegreesPerSecond(DegreesPerMM*8);//2mm/sec for testing
+	liftMotor->setVelocityDegreesPerSecond(DegreesPerMM*12);//2mm/sec for testing
 }
 
 bool LiftControl::CheckIfAtBottom(){
@@ -75,7 +75,7 @@ bool LiftControl::SetLiftHeight(float mm){
 }
 
 bool LiftControl::CheckIfPositionReached(){
-	if(liftMotor->getPosition()<targetLiftHeightTicks+1 && liftMotor->getPosition()>targetLiftHeightTicks-1){
+	if(liftMotor->getPosition()<targetLiftHeightTicks+2 && liftMotor->getPosition()>targetLiftHeightTicks-2){
 		liftMotor->SetTunings(0.015, 0.0, 0.0);
 		return true;
 	}
