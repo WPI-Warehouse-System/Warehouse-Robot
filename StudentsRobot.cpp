@@ -281,12 +281,13 @@ void StudentsRobot::updateStateMachine() {
 	case ReturningBin:
 		switch(binReturnStatus){
 			case SETTING_RETURN_LOCATION:
-				//Serial.println("GOT NEW RETURN COMMAND");
+				Serial.println("GOT NEW RETURN COMMAND");
 				binReturnStatus = GOING_TO_SHELF;
 			    navigation.setNavGoal(goalRow, goalColumn);
 			    binHandler.setBinHeight(goalShelf);
 				break;
 			case GOING_TO_SHELF:
+				Serial.println("GOT NEW RETURN COMMAND");
 		    	status = Navigating;
 		    	binReturnStatus = RETURNING_BIN;
 		    	statusAfterNav = ReturningBin;
@@ -295,7 +296,7 @@ void StudentsRobot::updateStateMachine() {
 				if(binHandler.checkBinReturnStatus() == FINISHED_RETURN){
 			    	binReturnStatus = SETTING_RETURN_LOCATION;
 			    	// TODO: send communication to GUI that bin is returned
-				//	Serial.println("FINISHED RETURN, GOING TO RUNNING");
+					Serial.println("FINISHED RETURN, GOING TO RUNNING");
 			    	status = Running;
 				}
 				break;
@@ -353,8 +354,8 @@ void StudentsRobot::updateStateMachine() {
 	break;
 
 	case Testing:
-		myCommandsStatus = Ready_for_new_task;
-		status = Running;
+		//myCommandsStatus = Ready_for_new_task;
+		//status = Running;
 /// LINE FOLLOWING
 //	    if((millis() - startTime) < 7000){
 //			robotChassis.lineFollowForwards();
@@ -366,10 +367,10 @@ void StudentsRobot::updateStateMachine() {
 //		}
 
 // Bin Return
-//		goalRow = 2;
-//		goalColumn = -2;
-//		goalShelf = 2;
-//		status = ReturningBin;
+		goalRow = 2;
+		goalColumn = -1;
+		goalShelf = 2;
+		status = ReturningBin;
 // Navigation
 //
 //		static int myCase = 1;

@@ -32,7 +32,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case TURN_TOWARDS_CORRECT_COLUMN:
-			//Serial.println("TURNING TOWARDS COLUMN");
+			Serial.println("TURNING TOWARDS COLUMN");
 			// determine if we are in the correct row or not
 			if(chassis->myChassisPose.currentRow != goalRow){
 				// if our current row isn't our goal row, then we need to navigate to the outer edge
@@ -80,7 +80,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_OUTER_EDGE:
-			//Serial.println("FINDING COL: 0, CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
+			Serial.println("FINDING COL: 0, CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
 			// navigate until column == 0
 			if(chassis->myChassisPose.currentColumn != 0){
 				chassis->lineFollowForwards();
@@ -91,7 +91,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_ROW:
-			//Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
+			Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
 			if(chassis->myChassisPose.currentRow != goalRow){
 				chassis->lineFollowForwards();
 			}
@@ -108,7 +108,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case TURN_TOWARDS_CORRECT_ROW:
-			//Serial.println("TURNING TOWARDS ROW");
+			Serial.println("TURNING TOWARDS ROW");
 			//If we're not in the right row, we need to find the right row
 			if(chassis->myChassisPose.currentRow > goalRow){
 			    if(chassis->myChassisPose.getOrientationToClosest90() != 180){
@@ -138,7 +138,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_COLUMN:
-			//Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
+			Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
 			if(chassis->myChassisPose.currentColumn != goalCol){
 				chassis->lineFollowForwards();
 			}

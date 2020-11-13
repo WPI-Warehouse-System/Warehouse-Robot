@@ -16,7 +16,7 @@ class Pose{
 	   int currentRow = 2;
 	   int currentColumn = 0;
 	   // current heading will be updated by the IMU during turnToHeading.
-	   float initialHeading = -90;
+	   float initialHeading = 0;
 	   float currentHeading = initialHeading;
 	   int rowCount = 0;
 	   int colCount = 0;

@@ -15,7 +15,7 @@ BinHandling::BinHandling(DrivingChassis* robotChassis, LiftControl* robotLift){
 
 void BinHandling::setBinHeight(int height){
     if(height == 1){
-        binHeight = 14.3; // From middle of cleat in bottom lift position to middle of bin on first shelf
+        binHeight = 16.5; // From middle of cleat in bottom lift position to middle of bin on first shelf
     }
     else{
     	binHeight = 131.65; // From middle of cleat in bottom lift position to middle of bin on second shelf
@@ -25,7 +25,7 @@ void BinHandling::setBinHeight(int height){
 BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 	switch(binProcurementState){
 		case ALIGN_WITH_BIN:
-			chassis->driveForward(35, 1000);
+			chassis->driveForward(56, 1000);
 			binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
 			binProcurementStateAfterMotionSetpointReached = TURN_TO_BIN;
 			break;
@@ -44,10 +44,7 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			chassis->driveStraight(0, DRIVING_FORWARDS);
 			if(!digitalRead(CLEAT_LIMIT_SWITCH)){
 				chassis->stop();
-				// drive forward another little bit (1 cm) to make sure we are pressed against the bin
-			    chassis->driveForward(10, 1000);
-				binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
-				binProcurementStateAfterMotionSetpointReached = GRAB_BIN;
+				binProcurementState = GRAB_BIN;
 			}
 			break;
 		case GRAB_BIN:
@@ -93,21 +90,25 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 	switch(binReturnState){
 		case ALIGN_WITH_SHELF:
-			chassis->driveForward(76, 2000); /// TODO: don't use magic number. Line sensor to COR distance
+			Serial.println("ALIGNING WITH SHELF");
+			chassis->driveForward(56, 2000); /// TODO: don't use magic number. Line sensor to COR distance
 			binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
 			binReturnStateAfterMotionSetpointReached = TURN_TO_SHELF;
 			break;
 		case TURN_TO_SHELF:
+			Serial.println("TURNING TO SHELF");
 			chassis->turnToHeading(0, 7500);
 			binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
 			binReturnStateAfterMotionSetpointReached = RAISE_BIN_TO_SHELF;
 			break;
 		case RAISE_BIN_TO_SHELF:
+			Serial.println("RAISING LIFT");
 			lift->SetLiftHeight(binHeight + BIN_LIP_OFFSET);
 			binReturnState = WAIT_FOR_LIFT_SETPOINT_REACHED_RETURN;
 			binReturnStateAfterLiftSetpointReached = APPROACH_SHELF;
 			break;
 		case APPROACH_SHELF:
+			Serial.println("APPROACHING SHELF");
 				// maybe we put in a timeout here? We can see how testing is going
 			chassis->driveStraight(0, DRIVING_FORWARDS);
 			if(chassis->lineSensor.onMarker()){
@@ -116,16 +117,19 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			}
 			break;
 		case PLACE_BIN_ON_SHELF:
+			Serial.println("PLACING BIN ON SHELF");
 			lift->SetLiftHeight(binHeight);
 			binReturnState = WAIT_FOR_LIFT_SETPOINT_REACHED_RETURN;
 			binReturnStateAfterLiftSetpointReached = BACK_AWAY_FROM_SHELF_RETURN;
 			break;
 		case BACK_AWAY_FROM_SHELF_RETURN:
+			Serial.println("BACKING AWAY");
 			chassis->driveBackwards(35, 1000);
 			binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
 			binReturnStateAfterMotionSetpointReached = BACK_UP_TO_WORLD_RETURN;
 			break;
 		case BACK_UP_TO_WORLD_RETURN:
+			Serial.println("GOING TO WORLD");
 			chassis->driveStraight(0, DRIVING_BACKWARDS);
 			if(chassis->lineSensor.onMarker()){
 				// we backed up to the world
