@@ -165,9 +165,9 @@ public:
 
 	BinReturnStates binReturnStatus = SETTING_RETURN_LOCATION;
 
-	HomingLiftStates homeLiftState = DONE_HOMING;
+	HomingLiftStates homeLiftState = STARTING_HOME;
 
-	MovingLiftFromGUIStates moveLiftState = DONE_LIFTING;
+	MovingLiftFromGUIStates moveLiftState = SET_LIFT_HEIGHT;
 
 
 

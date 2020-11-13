@@ -362,10 +362,10 @@ void StudentsRobot::updateStateMachine() {
 //		}
 
 // Bin Return
-		goalRow = 2;
-		goalColumn = -2;
-		goalShelf = 2;
-		status = ReturningBin;
+//		goalRow = 2;
+//		goalColumn = -2;
+//		goalShelf = 2;
+//		status = ReturningBin;
 // Navigation
 //
 //		static int myCase = 1;
