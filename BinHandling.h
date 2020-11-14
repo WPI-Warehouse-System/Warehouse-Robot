@@ -80,19 +80,19 @@ class BinHandling{
 	   BinProcurementRoutineStates binProcurementState = ALIGN_WITH_BIN;
 
 	   // This is the binProcurementState that occurs after a setpoint has been reached
-	   BinProcurementRoutineStates binProcurementStateAfterMotionSetpointReached;
+	   BinProcurementRoutineStates binProcurementStateAfterMotionSetpointReached = ALIGN_WITH_BIN;
 
 	   // This is the binProcurementState that occurs after a lift setpoint has been reached
-	   BinProcurementRoutineStates binProcurementStateAfterLiftSetpointReached;
+	   BinProcurementRoutineStates binProcurementStateAfterLiftSetpointReached = ALIGN_WITH_BIN;
 
 
 	   BinReturnRoutineStates binReturnState = ALIGN_WITH_SHELF;
 
 	   // This is the binReturnState that occurs after a setpoint has been reached
-	   BinReturnRoutineStates binReturnStateAfterMotionSetpointReached;
+	   BinReturnRoutineStates binReturnStateAfterMotionSetpointReached = ALIGN_WITH_SHELF;
 
 	   // This is the binProcurementState that occurs after a lift setpoint has been reached
-	   BinReturnRoutineStates binReturnStateAfterLiftSetpointReached;
+	   BinReturnRoutineStates binReturnStateAfterLiftSetpointReached = ALIGN_WITH_SHELF;
 
 	   float binHeight = 0;
     private:

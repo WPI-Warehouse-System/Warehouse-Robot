@@ -30,9 +30,12 @@
  */
 enum RobotStateMachine {
 	StartupRobot = 0, StartRunning = 1, Running = 2, Halting = 3, Halt = 4, WAIT_FOR_MOTORS_TO_FINNISH=5, WAIT_FOR_TIME=6,
-	Testing = 7, Navigating = 8, ParkingRobot = 9, HomingLift = 10, MovingLiftFromGUI = 11,  DeliveringBin = 12, ReturningBin = 13
+	Testing = 7, Navigating = 8, ParkingRobot = 9, HomingLift = 10, MovingLiftFromGUI = 11,  DeliveringBin = 12, ReturningBin = 13, //was 13
 
 };
+
+const String StringStates[14] = {"StartupRobot", "StartRunning", "Running", "Halting", "Halt", "WFMF", "WFT", "Test", "NAV", "PRK", "Homing", "MovingLift", "DLV", "RTN"};
+
 /**
  * @enum ComStackStatusState
  * These are values for the communications stack
@@ -152,6 +155,8 @@ public:
 	 * This is internal data representing the runtime status of the robot for use in its state machine
 	 */
 	RobotStateMachine status = StartupRobot;
+
+	RobotStateMachine lastStatus = StartupRobot;
 
 	// This is the status to run to after navigation. Initialize to Running
 	RobotStateMachine statusAfterNav = Running;
