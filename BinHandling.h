@@ -20,7 +20,6 @@
 
 // TODO: Need to align with bin before turning
 enum BinProcurementRoutineStates{
-	ALIGN_WITH_BIN,
 	TURN_TO_BIN,
 	RAISE_LIFT_TO_SHELF,
 	APPROACH_BIN,
@@ -39,7 +38,6 @@ enum BinProcurementRoutineStates{
  * States used in the bin return state machine, not the main robot state machine
 */
 enum BinReturnRoutineStates{
-	ALIGN_WITH_SHELF,
 	TURN_TO_SHELF,
 	RAISE_BIN_TO_SHELF,
 	APPROACH_SHELF,
@@ -77,22 +75,22 @@ class BinHandling{
 	   DrivingChassis* chassis = NULL;
 	   LiftControl* lift = NULL;
 
-	   BinProcurementRoutineStates binProcurementState = ALIGN_WITH_BIN;
+	   BinProcurementRoutineStates binProcurementState = TURN_TO_BIN;
 
 	   // This is the binProcurementState that occurs after a setpoint has been reached
-	   BinProcurementRoutineStates binProcurementStateAfterMotionSetpointReached = ALIGN_WITH_BIN;
+	   BinProcurementRoutineStates binProcurementStateAfterMotionSetpointReached = TURN_TO_BIN;
 
 	   // This is the binProcurementState that occurs after a lift setpoint has been reached
-	   BinProcurementRoutineStates binProcurementStateAfterLiftSetpointReached = ALIGN_WITH_BIN;
+	   BinProcurementRoutineStates binProcurementStateAfterLiftSetpointReached = TURN_TO_BIN;
 
 
-	   BinReturnRoutineStates binReturnState = ALIGN_WITH_SHELF;
+	   BinReturnRoutineStates binReturnState = TURN_TO_SHELF;
 
 	   // This is the binReturnState that occurs after a setpoint has been reached
-	   BinReturnRoutineStates binReturnStateAfterMotionSetpointReached = ALIGN_WITH_SHELF;
+	   BinReturnRoutineStates binReturnStateAfterMotionSetpointReached = TURN_TO_SHELF;
 
 	   // This is the binProcurementState that occurs after a lift setpoint has been reached
-	   BinReturnRoutineStates binReturnStateAfterLiftSetpointReached = ALIGN_WITH_SHELF;
+	   BinReturnRoutineStates binReturnStateAfterLiftSetpointReached = TURN_TO_SHELF;
 
 	   float binHeight = 0;
     private:

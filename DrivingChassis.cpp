@@ -412,14 +412,17 @@ void DrivingChassis::lineFollowForwards(){
 
 		  // we need to count rows
 		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
-			  myChassisPose.rowCount += 1;
-		      if(myChassisPose.rowCount == 2){
-		    	  if(ordinalDirection_degrees == 180)
-		              myChassisPose.currentRow -= 1;
-		    	  else
-		    		  myChassisPose.currentRow += 1;
-		          myChassisPose.rowCount = 0;
-		      }
+//			  myChassisPose.rowCount += 1;
+//		      if(myChassisPose.rowCount == 2){
+//		    	  if(ordinalDirection_degrees == 180)
+//		              myChassisPose.currentRow -= 1;
+//		    	  else
+//		    		  myChassisPose.currentRow += 1;
+//		          myChassisPose.rowCount = 0;
+			  if(ordinalDirection_degrees == 180)
+				  myChassisPose.currentRow -= 1;
+			  else
+				  myChassisPose.currentRow += 1;
 		  }
 
 		  // we need to count columns
@@ -432,17 +435,36 @@ void DrivingChassis::lineFollowForwards(){
 	    //Serial.println("Line Count: " + String(lineCount));
 	  }
 
-
-	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
-			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
-			lineSensor.canCountLine = true;
-	  }
+// NOTE:BEFORE, THIS WAS ACTING LIKE A DIGITAL SENSOR... HOW I DIDN'T REALIZE BEFORE, IDK
+//	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
+//			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+//			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
+//			lineSensor.canCountLine = true;
+//	  }
 	  else{
+		  rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	      leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
 		  lineSensor.canCountLine = true;
 	  }
-	  myleft -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection);
-      myright -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection);
+
+//      if(abs(rightCorrection) > 150){
+//    	  if(rightCorrection > 150){
+//    		  rightCorrection = 150;
+//    	  }
+//    	  else{
+//    		  rightCorrection = -150;
+//    	  }
+//      }
+//      if(abs(leftCorrection) > 150){
+//    	  if(leftCorrection > 150){
+//    		  leftCorrection = 150;
+//    	  }
+//    	  else{
+//    		  leftCorrection = -150;
+//    	  }
+//      }
+	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection)/8.0);
+      myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection)/8.0);
 }
 /**
  *

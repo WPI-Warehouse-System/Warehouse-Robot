@@ -361,20 +361,20 @@ void StudentsRobot::updateStateMachine() {
 		//myCommandsStatus = Ready_for_new_task;
 		//status = Running;
 /// LINE FOLLOWING
-//	    if((millis() - startTime) < 7000){
-//			robotChassis.lineFollowForwards();
-//		}
-//		else{
-//		   robotChassis.stop();
-//		   robotChassis.lineSensor.resetLineCount();
-//		   status = Running;
-//		}
+	    if((millis() - startTime) < 5000){
+			robotChassis.lineFollowForwards();
+		}
+		else{
+		   robotChassis.stop();
+		   robotChassis.lineSensor.resetLineCount();
+		   status = Running;
+		}
 
 // Bin Return
-		goalRow = 2;
-		goalColumn = -1;
-		goalShelf = 2;
-		status = ReturningBin;
+//		goalRow = 2;
+//		goalColumn = -1;
+//		goalShelf = 2;
+//		status = ReturningBin;
 // Navigation
 //
 //		static int myCase = 1;

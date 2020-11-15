@@ -16,10 +16,10 @@ class LineFollower{
 	   LineFollower();
 	   // on black line
 	   const int ON_BLACK = 3692;//3750;
-	   int lineFollowingSpeedForwards_mm_per_sec = 150;
+	   int lineFollowingSpeedForwards_mm_per_sec = 100; // was 150, 125 (& 1.6 below)
 	   int lineFollowingSpeedBackwards_mm_per_sec = 175;
 	   float lineFollowingKpBackwards = .002*lineFollowingSpeedBackwards_mm_per_sec;
-	   float lineFollowingKpForwards = 1.3; //1.6
+	   float lineFollowingKpForwards = 1.6; //1.6, was 1.3
 	   int lineCount = 0;
        bool canCountLine = false; // so we can start on a line
 

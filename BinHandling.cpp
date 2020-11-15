@@ -24,11 +24,6 @@ void BinHandling::setBinHeight(int height){
 
 BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 	switch(binProcurementState){
-		case ALIGN_WITH_BIN:
-			chassis->driveForward(56, 1000);
-			binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
-			binProcurementStateAfterMotionSetpointReached = TURN_TO_BIN;
-			break;
 		case TURN_TO_BIN:
 			chassis->turnToHeading(0, 7500);
 			binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
@@ -62,7 +57,9 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			if(chassis->lineSensor.onMarker()){
 				// we backed up to the world
 				chassis->stop();
-				binProcurementState = LOWER_BIN;
+				chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
+				binProcurementStateAfterMotionSetpointReached = LOWER_BIN;
+				binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
 			}
 			break;
 		case LOWER_LIFT:
@@ -71,7 +68,7 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterLiftSetpointReached = FINISHED_PROCUREMENT;
 			break;
 		case FINISHED_PROCUREMENT:
-			binProcurementState = ALIGN_WITH_BIN;
+			binProcurementState = TURN_TO_BIN;
 			break;
 		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT:
 		    if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
@@ -89,12 +86,6 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 
 BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 	switch(binReturnState){
-		case ALIGN_WITH_SHELF:
-			//Serial.println("ALIGNING WITH SHELF");
-			chassis->driveForward(56, 2000); /// TODO: don't use magic number. Line sensor to COR distance
-			binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
-			binReturnStateAfterMotionSetpointReached = TURN_TO_SHELF;
-			break;
 		case TURN_TO_SHELF:
 			//Serial.println("TURNING TO SHELF");
 			chassis->turnToHeading(0, 7500);
@@ -134,10 +125,9 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			if(chassis->lineSensor.onMarker()){
 				// we backed up to the world
 				chassis->stop();
-//				chassis->driveForward(76, 2000); /// TODO: don't use magic number. Line sensor to COR distance
-//				binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
-//				binReturnStateAfterMotionSetpointReached = LOWER_LIFT;
-				binReturnState = LOWER_LIFT;
+				chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
+				binReturnStateAfterMotionSetpointReached = LOWER_LIFT;
+				binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
 			}
 			break;
 		case LOWER_LIFT:
@@ -146,7 +136,7 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			binReturnStateAfterLiftSetpointReached = FINISHED_RETURN;
 			break;
 		case FINISHED_RETURN:
-			binReturnState = ALIGN_WITH_SHELF;
+			binReturnState = TURN_TO_SHELF;
 			break;
 		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN:
 		    if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){

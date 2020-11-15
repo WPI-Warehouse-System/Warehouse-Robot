@@ -51,6 +51,7 @@ class Navigation{
 	   // after setting the turn, our state becomes WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION, before becoming
 	   // FINDING_COLUMN. navStateAfterMotionSetpointReached becomes FINDING_COLUMN in this case
 	   NavigationStates navStateAfterMotionSetpointReached = INITIALIZE_NAVIGATION;
+	   NavigationStates navStateAfterAlignment = INITIALIZE_NAVIGATION;
 
 		/**
 		 * Sets a new navigation goal
