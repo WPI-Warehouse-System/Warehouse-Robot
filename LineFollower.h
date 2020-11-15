@@ -18,7 +18,7 @@ class LineFollower{
 	   const int ON_BLACK = 3600;//3750;
 	   const int ON_GREY = 2850;
 	   const int ON_WHITE = 2100;
-	   int lineFollowingSpeedForwards_mm_per_sec = 160; // was 150, 125 (& 1.6 below), was 100, 175
+	   int lineFollowingSpeedForwards_mm_per_sec = 175; // was 150, 125 (& 1.6 below), was 100, 175
 	   int lineFollowingSpeedBackwards_mm_per_sec = 175;
 	   float lineFollowingKpBackwards = .002*lineFollowingSpeedBackwards_mm_per_sec;
 	   //NOTE: The closer we want to be to black, the higher this gain needs to be. Since we will be staying on white 90% of the
