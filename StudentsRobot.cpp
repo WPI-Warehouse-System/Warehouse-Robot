@@ -361,8 +361,9 @@ void StudentsRobot::updateStateMachine() {
 		//myCommandsStatus = Ready_for_new_task;
 		//status = Running;
 /// LINE FOLLOWING
-	    if((millis() - startTime) < 5000){
+	    if((millis() - startTime) < 7000){
 			robotChassis.lineFollowForwards();
+	    	//robotChassis.lineSensor.calibrate();
 		}
 		else{
 		   robotChassis.stop();

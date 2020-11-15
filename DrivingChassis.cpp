@@ -432,39 +432,24 @@ void DrivingChassis::lineFollowForwards(){
 
 	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
 	    }
-	    //Serial.println("Line Count: " + String(lineCount));
+           rightCorrection = 0;
+           leftCorrection = 0;
 	  }
 
-// NOTE:BEFORE, THIS WAS ACTING LIKE A DIGITAL SENSOR... HOW I DIDN'T REALIZE BEFORE, IDK
-//	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
-//			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-//			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
-//			lineSensor.canCountLine = true;
-//	  }
 	  else{
-		  rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-	      leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
+		  rightCorrection = (lineSensor.ON_WHITE - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	      leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE)*lineSensor.lineFollowingKpForwards;
+	      //Serial.println("RIGHT VALUE: " + String(rightSensorValue));
+	      //Serial.println("LEFT VALUE: " + String(leftSensorValue));
+	  }
+
+	  if(leftSensorValue <= lineSensor.ON_GREY && rightSensorValue<= lineSensor.ON_GREY)
+	  {
 		  lineSensor.canCountLine = true;
 	  }
 
-//      if(abs(rightCorrection) > 150){
-//    	  if(rightCorrection > 150){
-//    		  rightCorrection = 150;
-//    	  }
-//    	  else{
-//    		  rightCorrection = -150;
-//    	  }
-//      }
-//      if(abs(leftCorrection) > 150){
-//    	  if(leftCorrection > 150){
-//    		  leftCorrection = 150;
-//    	  }
-//    	  else{
-//    		  leftCorrection = -150;
-//    	  }
-//      }
-	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection)/8.0);
-      myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection)/8.0);
+	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection));
+      myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection));
 }
 /**
  *
