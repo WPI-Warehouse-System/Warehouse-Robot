@@ -23,6 +23,7 @@ void LineFollower::calibrate(){
     Serial.println("LEFT LINE SENSOR VALUE: " + String(leftSensorValue));
     Serial.println("RIGHT LINE SENSOR VALUE: " + String(rightSensorValue));
 }
+
 void LineFollower::resetLineCount(){
     lineCount = 0;
 }

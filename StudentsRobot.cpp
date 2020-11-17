@@ -361,15 +361,22 @@ void StudentsRobot::updateStateMachine() {
 		//myCommandsStatus = Ready_for_new_task;
 		//status = Running;
 /// LINE FOLLOWING
-	    if((millis() - startTime) < 7000){
-			robotChassis.lineFollowForwards();
-	    	//robotChassis.lineSensor.calibrate();
-		}
-		else{
+//	    if((millis() - startTime) < 7000){
+//			robotChassis.lineFollowForwards();
+//	    	//robotChassis.lineSensor.calibrate();
+//		}
+//		else{
+//		   robotChassis.stop();
+//		   robotChassis.lineSensor.resetLineCount();
+//		   status = Running;
+//		}
+
+// Line Centering
+	if(robotChassis.isCenteredOnLine()){
 		   robotChassis.stop();
 		   robotChassis.lineSensor.resetLineCount();
 		   status = Running;
-		}
+	}
 
 // Bin Return
 //		goalRow = 2;

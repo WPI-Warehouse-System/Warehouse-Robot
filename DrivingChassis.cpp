@@ -172,8 +172,8 @@ void DrivingChassis::turnToHeading(float degreesToRotateBase, int msDuration){
  * @note this function is fast-return and should not block
  */
 DrivingStatus DrivingChassis::statusOfChassisDriving() {
+	int currentOrientation = myChassisPose.getOrientationToClosest90();
 	switch(motionType){
-
 	    case TURNING:{
 			 // check for timeout
 			 if((millis() - startTimeOfMovement_ms) > timeout_ms){
@@ -244,7 +244,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
+	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
+	    	    	driveStraight(currentOrientation, DRIVING_FORWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -271,7 +272,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = - currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
+	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
+	    	    	driveStraight(currentOrientation, DRIVING_BACKWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -445,6 +447,37 @@ void DrivingChassis::lineFollowForwards(){
 	  }
 	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection));
       myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection));
+}
+
+bool DrivingChassis::isCenteredOnLine(){
+	static int settlingCount = 0;
+	int targetValue = (lineSensor.ON_GREY - 400);
+	int tolerance = 450;
+	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
+	int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+	float rightCorrection = (targetValue - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+    float leftCorrection =  (leftSensorValue - targetValue)*lineSensor.lineFollowingKpForwards;
+    int rightError = fabs(rightSensorValue - targetValue);
+    int leftError = fabs(leftSensorValue - targetValue);
+    if(rightError <= tolerance && leftError <= tolerance){
+    	settlingCount++;
+    }
+
+    else{
+    	settlingCount = 0;
+    }
+
+    if(settlingCount > 100){
+    	Serial.println("CENTERED");
+    	stop();
+    	return true;
+    }
+
+    myleft -> setVelocityDegreesPerSecond(rightCorrection);
+    myright -> setVelocityDegreesPerSecond(leftCorrection);
+
+    return false;
+
 }
 /**
  *

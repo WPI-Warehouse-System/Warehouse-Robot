@@ -211,6 +211,8 @@ public:
 
      void lineFollowForwards();
 
+     bool isCenteredOnLine();
+
 	/**
 	 * Stops all motors
 	 */
