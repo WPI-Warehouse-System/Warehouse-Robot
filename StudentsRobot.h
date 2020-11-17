@@ -131,7 +131,7 @@ private:
 	GetIMU * IMU;
 public:
 	float liftHeight = 0;//In mm
-	bool robotParked = false;
+	bool robotParked = true; // make false if not starting false
 	/**
 	 * Constructor for StudentsRobot
 	 *
@@ -170,7 +170,7 @@ public:
 
 	BinReturnStates binReturnStatus = SETTING_RETURN_LOCATION;
 
-	HomingLiftStates homeLiftState = DONE_HOMING;
+	HomingLiftStates homeLiftState = STARTING_HOME;
 
 	MovingLiftFromGUIStates moveLiftState = DONE_LIFTING;
 

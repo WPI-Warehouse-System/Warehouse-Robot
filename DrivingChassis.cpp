@@ -175,6 +175,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	int currentOrientation = myChassisPose.getOrientationToClosest90();
 	switch(motionType){
 	    case TURNING:{
+	    	 static float accum = 0;
+	    	 static float lastHeadingError = 0;
 			 // check for timeout
 			 if((millis() - startTimeOfMovement_ms) > timeout_ms){
 					//timeout occured. Stop the robot
@@ -206,7 +208,18 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 					headingError += 360;
 				}
 			}
-			float motorEffort = (turningMovementKp) * headingError;
+
+			// Integral term
+			accum += headingError;
+			if(accum > 100){
+				accum = 100;
+			}
+
+			// derivative term
+			float deltaChange = lastHeadingError - headingError;
+			lastHeadingError = headingError;
+
+			float motorEffort = (turningMovementKp) * headingError + accum*turningMovementKi + deltaChange*turningMovementKd;
 			//myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
 			myChassisPose.currentHeading = currentHeading;
 			if(fabs(headingError) <= wheelMovementDeadband_deg)
@@ -214,6 +227,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 				//Serial.println("Reached Setpoint\r\n");
 				stop();
 				adjustedHeading = false;
+				accum = 0;
 				return REACHED_SETPOINT;
 			}
 			else{

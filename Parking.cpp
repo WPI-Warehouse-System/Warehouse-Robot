@@ -83,9 +83,11 @@ ExitParkingRoutineStates Parking::getOutOfParkingStatus(){
 			// this drive forwards is so that we are in line with the world, wherever we chose to navigate to
 			// 130 IS a magic number. Once measurements are confirmed for the new robot, this needs to change into
 			// a variable.
-			chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 2500);
-		    exitParkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING;
-			exitParkingStateAfterMotionSetpointReached = FINISHED_EXIT_PARKING;
+			chassis->driveStraight(90, DRIVING_FORWARDS);
+            if(chassis -> lineSensor.onMarker()){
+            	chassis->stop();
+            	exitParkingState = FINISHED_EXIT_PARKING;
+            }
 			break;
 		case WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING:
 			if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
