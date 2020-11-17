@@ -78,9 +78,7 @@ NavigationStates Navigation::checkNavStatus(){
 				}
 				// we're at the right column and row
 				else{
-					chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-				    navStateAfterMotionSetpointReached = FINISHED_NAVIGATION;
-					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+					navState = FINISHED_NAVIGATION;
 				}
 			}
 			break;
@@ -92,13 +90,11 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			else{
 				chassis->stop();
-				chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-			    navStateAfterMotionSetpointReached = TURN_TOWARDS_CORRECT_ROW;
-				navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				navState = TURN_TOWARDS_CORRECT_ROW;
 			}
 			break;
 		case FINDING_ROW:
-			//Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
+			Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
 			if(chassis->myChassisPose.currentRow != goalRow){
 				chassis->lineFollowForwards();
 			}
@@ -106,15 +102,11 @@ NavigationStates Navigation::checkNavStatus(){
 				chassis->stop();
 				// if we're at the right column, stop
 				if(chassis->myChassisPose.currentColumn == goalCol){
-					chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-				    navStateAfterMotionSetpointReached = FINISHED_NAVIGATION;
-					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+				    navState = FINISHED_NAVIGATION;
 				}
 				//otherwise turn towards the right column
 				else if (goalCol != 0){
-					chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-				    navStateAfterMotionSetpointReached = TURN_TOWARDS_CORRECT_COLUMN;
-					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+					navState = TURN_TOWARDS_CORRECT_COLUMN;
 				}
 			}
 			break;
@@ -149,16 +141,14 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_COLUMN:
-			//Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
+			Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
 			if(chassis->myChassisPose.currentColumn != goalCol){
 				chassis->lineFollowForwards();
 			}
 			else{
 			   chassis->stop();
 			   if(goalRow == chassis->myChassisPose.currentRow){
-					chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-				    navStateAfterMotionSetpointReached = FINISHED_NAVIGATION;
-					navState = WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION;
+					navState = FINISHED_NAVIGATION;
 			   }
 			}
 			break;

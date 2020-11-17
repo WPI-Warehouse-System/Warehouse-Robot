@@ -48,7 +48,7 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterLiftSetpointReached = BACK_AWAY_FROM_SHELF_PROCUREMENT;
 			break;
 		case BACK_AWAY_FROM_SHELF_PROCUREMENT:
-			chassis->driveBackwards(35, 1000);
+			chassis->driveBackwards(50, 3000);
 			binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
 			binProcurementStateAfterMotionSetpointReached = BACK_UP_TO_WORLD_PROCUREMENT;
 			break;
@@ -57,9 +57,7 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			if(chassis->lineSensor.onMarker()){
 				// we backed up to the world
 				chassis->stop();
-				chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-				binProcurementStateAfterMotionSetpointReached = LOWER_BIN;
-				binProcurementState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT;
+				binProcurementState = LOWER_BIN;
 			}
 			break;
 		case LOWER_LIFT:
@@ -102,7 +100,7 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			//Serial.println("APPROACHING SHELF");
 				// maybe we put in a timeout here? We can see how testing is going
 			chassis->driveStraight(0, DRIVING_FORWARDS);
-			if(chassis->lineSensor.onMarker()){
+			if(chassis->lineSensor.onMarkerFront()){
 				chassis->stop();
 				binReturnState = PLACE_BIN_ON_SHELF;
 			}
@@ -115,7 +113,7 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			break;
 		case BACK_AWAY_FROM_SHELF_RETURN:
 			//Serial.println("BACKING AWAY");
-			chassis->driveBackwards(35, 1000);
+			chassis->driveBackwards(50, 3000);
 			binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
 			binReturnStateAfterMotionSetpointReached = BACK_UP_TO_WORLD_RETURN;
 			break;
@@ -125,9 +123,7 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			if(chassis->lineSensor.onMarker()){
 				// we backed up to the world
 				chassis->stop();
-				chassis->driveForward(DISTANCE_TO_LINE_SENSOR, 3000);
-				binReturnStateAfterMotionSetpointReached = LOWER_LIFT;
-				binReturnState = WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN;
+				binReturnState = LOWER_LIFT;
 			}
 			break;
 		case LOWER_LIFT:

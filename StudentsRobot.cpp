@@ -85,8 +85,8 @@ StudentsRobot::StudentsRobot(PIDMotor * motor1, PIDMotor * motor2,
 	// Set up the Analog sensors
 	pinMode(LEFT_LINE_SENSOR, ANALOG);
 	pinMode(RIGHT_LINE_SENSOR, ANALOG);
-	pinMode(ANALOG_SENSE_THREE, ANALOG);
-	pinMode(ANALOG_SENSE_FOUR, ANALOG);
+	pinMode(LEFT_LINE_DETECT, ANALOG);
+	pinMode(RIGHT_LINE_DETECT, ANALOG);
 	// H-Bridge enable pin
 	pinMode(H_BRIDGE_ENABLE, OUTPUT);
 	// Stepper pins
@@ -360,23 +360,23 @@ void StudentsRobot::updateStateMachine() {
 	case Testing:
 		//myCommandsStatus = Ready_for_new_task;
 		//status = Running;
-/// LINE FOLLOWING
-//	    if((millis() - startTime) < 7000){
-//			robotChassis.lineFollowForwards();
-//	    	//robotChassis.lineSensor.calibrate();
-//		}
-//		else{
-//		   robotChassis.stop();
-//		   robotChassis.lineSensor.resetLineCount();
-//		   status = Running;
-//		}
-
-// Line Centering
-	if(robotChassis.isCenteredOnLine()){
+// LINE FOLLOWING
+	    if((millis() - startTime) < 7000){
+			//robotChassis.lineFollowForwards();
+	    	robotChassis.lineSensor.calibrate();
+		}
+		else{
 		   robotChassis.stop();
 		   robotChassis.lineSensor.resetLineCount();
 		   status = Running;
-	}
+		}
+
+// Line Centering
+//	if(robotChassis.isCenteredOnLine()){
+//		   robotChassis.stop();
+//		   robotChassis.lineSensor.resetLineCount();
+//		   status = Running;
+//	}
 
 // Bin Return
 //		goalRow = 2;

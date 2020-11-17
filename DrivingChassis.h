@@ -19,7 +19,7 @@
 #define MAX_SPEED_MM_PER_SEC 100 // was 100, was 75
 #define MAX_MOTOR_EFFORT_DURING_TURN 260 //300 //275 // 500
 
-#define DISTANCE_TO_LINE_SENSOR     76
+#define DISTANCE_TO_LINE_SENSOR     48
 
 /**
  * @enum DrivingStatus
@@ -94,7 +94,7 @@ public:
 	MotionType motionType = DRIVING_FORWARDS;
 	unsigned long startTimeOfMovement_ms;
 	float wheelMovementKp = 3.5;// was 3.9
-	float turningMovementKp = 21; //was 9, 11.7, 17.5
+	float turningMovementKp = 18; //was 9, 11.7, 17.5, 21
 	float wheelMovementDeadband_mm = 2.5;
 	float wheelMovementDeadband_deg = .5;
 	float motionSetpoint = 0;

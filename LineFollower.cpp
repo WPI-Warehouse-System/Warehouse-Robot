@@ -12,6 +12,13 @@ LineFollower::LineFollower(){
 }
 
 bool LineFollower::onMarker(){
+	int leftLineDetectSensorValue = analogRead(LEFT_LINE_DETECT);
+    int rightLineDetectSensorValue = analogRead(RIGHT_LINE_DETECT);
+    return (leftLineDetectSensorValue >= ON_BLACK && rightLineDetectSensorValue>= ON_BLACK);
+}
+
+
+bool LineFollower::onMarkerFront(){
 	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
     int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
     return (leftSensorValue >= ON_BLACK && rightSensorValue>= ON_BLACK);
