@@ -13,8 +13,8 @@ class Pose{
     public:
 	   Pose();
 	   // current row and current column will be updated by the line sensor lineCount
-	   int currentRow = 0;
-	   int currentColumn = 0;
+	   int currentRow = 2;
+	   int currentColumn = -1;
 	   // current heading will be updated by the IMU during turnToHeading.
 	   float initialHeading = 0;
 	   float currentHeading = initialHeading;

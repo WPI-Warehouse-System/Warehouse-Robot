@@ -13,6 +13,7 @@
 #define BINHANDLING_H_
 
 #define BIN_LIP_OFFSET 15 // 1.5 cm
+#define MAX_RETRIES_PROCUREMENT 5
 /*
  * @enum BinProcurementStates
  * States used in the Bin procurement state machine, not the main robot state machine
