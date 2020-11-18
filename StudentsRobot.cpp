@@ -270,7 +270,10 @@ void StudentsRobot::updateStateMachine() {
 			case PROCURING_BIN:
 				if(binHandler.checkBinProcurementStatus() == FINISHED_PROCUREMENT){
 			    	binDeliveryStatus = GOING_TO_USER;
-			    	navigation.setNavGoal(0, 0); // replace with coordinates of designated drop off
+			    	goalRow = 1;
+			    	goalColumn = -3;
+			    	navigation.setNavGoal(goalRow, goalColumn); // replace with coordinates of designated drop off
+			    	Serial.println("Navigating to 0,0");
 			    	status = Navigating;
 			    	statusAfterNav = DeliveringBin;
 				}

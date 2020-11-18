@@ -66,6 +66,7 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterLiftSetpointReached = FINISHED_PROCUREMENT;
 			break;
 		case FINISHED_PROCUREMENT:
+			Serial.println("FINISHED PROCUREMENT");
 			binProcurementState = TURN_TO_BIN;
 			break;
 		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT:
