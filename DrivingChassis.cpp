@@ -425,6 +425,7 @@ void DrivingChassis::lineFollowForwards(){
 	  float rightCorrection = 0;
 	  if(lineDetectLeft >= lineSensor.ON_BLACK && lineDetectRight >= lineSensor.ON_BLACK)
 	  {
+	   //Serial.println("Settling Count: " + String(settlingCount));
 	   if(lineSensor.canCountLine){
 		   //Serial.println("ON BLACK");
 		   lineSensor.lineCount++;
@@ -454,22 +455,19 @@ void DrivingChassis::lineFollowForwards(){
 
 	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
 	    }
-	      settlingCount = 0;
+	    settlingCount = 0;
 	  }
 
-	  else{
-		  //Serial.println("ON WHITE");
-		  rightCorrection = (lineSensor.ON_WHITE - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-	      leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE)*lineSensor.lineFollowingKpForwards;
-//	      Serial.println("RIGHT VALUE: " + String(rightSensorValue));
-//	      Serial.println("LEFT VALUE: " + String(leftSensorValue));
-	      settlingCount++;
-
-	      if(settlingCount >= 50 && !lineSensor.canCountLine){
-	           lineSensor.canCountLine = true;
-	           settlingCount = 0;
-	      }
+	  else if(lineDetectLeft <= lineSensor.ON_GREY && lineDetectRight <= lineSensor.ON_GREY){
+		  settlingCount++;
+		  if(settlingCount > 100){
+			 settlingCount = 0;
+		     lineSensor.canCountLine = true;
+		  }
 	  }
+
+	  rightCorrection = (lineSensor.ON_WHITE - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE)*lineSensor.lineFollowingKpForwards;
 	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection));
       myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection));
 }
@@ -498,8 +496,8 @@ bool DrivingChassis::isCenteredOnLine(){
     	return true;
     }
 
-    myleft -> setVelocityDegreesPerSecond(rightCorrection);
-    myright -> setVelocityDegreesPerSecond(leftCorrection);
+    myleft -> setVelocityDegreesPerSecond(leftCorrection);
+    myright -> setVelocityDegreesPerSecond(rightCorrection);
 
     return false;
 

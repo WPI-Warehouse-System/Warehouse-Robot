@@ -27,8 +27,12 @@ bool LineFollower::onMarkerFront(){
 void LineFollower::calibrate(){
 	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
     int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
-    Serial.println("LEFT LINE SENSOR VALUE: " + String(leftSensorValue));
-    Serial.println("RIGHT LINE SENSOR VALUE: " + String(rightSensorValue));
+	int leftLineDetectSensorValue = analogRead(LEFT_LINE_DETECT);
+    int rightLineDetectSensorValue = analogRead(RIGHT_LINE_DETECT);
+    Serial.print("LEFT LINE SENSOR VALUE: " + String(leftSensorValue) + " ");
+    Serial.print("RIGHT LINE SENSOR VALUE: " + String(rightSensorValue) + " ");
+    Serial.print("LEFT DETECT SENSOR VALUE: " + String(leftLineDetectSensorValue) + " ");
+    Serial.println("RIGHT DETECT SENSOR VALUE: " + String(rightLineDetectSensorValue) + " ");
 }
 
 void LineFollower::resetLineCount(){

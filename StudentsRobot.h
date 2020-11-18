@@ -131,7 +131,7 @@ private:
 	GetIMU * IMU;
 public:
 	float liftHeight = 0;//In mm
-	bool robotParked = true; // make false if not starting false
+	bool robotParked = false; // make false if not starting false
 	/**
 	 * Constructor for StudentsRobot
 	 *
