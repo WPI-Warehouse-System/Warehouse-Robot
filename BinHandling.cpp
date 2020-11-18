@@ -69,11 +69,19 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			Serial.println("FINISHED PROCUREMENT");
 			binProcurementState = TURN_TO_BIN;
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT:
-		    if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT:{
+		    DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+		    if(motionStatus == REACHED_SETPOINT){
 			    binProcurementState = binProcurementStateAfterMotionSetpointReached;
 		    }
+			else if(motionStatus == TIMED_OUT){
+				binProcurementState = TIMED_OUT_PROCUREMENT;
+			}
+		}
             break;
+		case TIMED_OUT_PROCUREMENT:
+			binProcurementState = TURN_TO_BIN;
+			break;
 	    case WAIT_FOR_LIFT_SETPOINT_REACHED_PROCUREMENT:
 			 if(lift->CheckIfPositionReached()){
 				    binProcurementState = binProcurementStateAfterLiftSetpointReached;
@@ -135,10 +143,18 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 		case FINISHED_RETURN:
 			binReturnState = TURN_TO_SHELF;
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN:
-		    if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
+		case TIMED_OUT_RETURN:
+			binReturnState = TURN_TO_SHELF;
+			break;
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN:{
+		    DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+		    if(motionStatus == REACHED_SETPOINT){
 			    binReturnState = binReturnStateAfterMotionSetpointReached;
 		    }
+			else if(motionStatus == TIMED_OUT){
+				binReturnState = TIMED_OUT_RETURN;
+			}
+		}
             break;
 	    case WAIT_FOR_LIFT_SETPOINT_REACHED_RETURN:
 			 if(lift->CheckIfPositionReached()){

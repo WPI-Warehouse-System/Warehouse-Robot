@@ -220,12 +220,19 @@ void StudentsRobot::updateStateMachine() {
 				}
 				break;
 
-			case NAVIGATING:
-				if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
+			case NAVIGATING:{
+				NavigationStates navRoutineStatus = navigation.checkNavStatus();
+				if(navRoutineStatus == FINISHED_NAVIGATION){
 					navigationStatus = SETTING_NAV_GOAL;
 					Serial.println("FINISHED NAVIGATION");
 					status = statusAfterNav;
 				}
+				else if(navRoutineStatus == TIMED_OUT_NAVIGATION){
+					navigationStatus = SETTING_NAV_GOAL;
+					Serial.println("NAV TIMED OUT. GOING TO RUNNING");
+					status = Running;
+				}
+			}
 				break;
 			}
 //		if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
@@ -244,13 +251,21 @@ void StudentsRobot::updateStateMachine() {
 	    	parkingStatus = PARKING;
 	    	statusAfterNav = ParkingRobot;
 	       break;
-	    case PARKING:
-	    	if(parking.checkParkingStatus() == FINISHED_PARKING){
+	    case PARKING:{
+	    	ParkingRoutineStates parkingRoutineStatus = parking.checkParkingStatus();
+	    	if(parkingRoutineStatus == FINISHED_PARKING){
 		    	parkingStatus = SETTING_PARKING_GOAL;
 		    	status = Running;
 		    	statusAfterNav = Running;
                 robotParked = true;
 	    	}
+	    	else if(parkingRoutineStatus == TIMED_OUT_PARKING){
+	    		status = Running;
+	    		statusAfterNav = Running;
+	    		parkingStatus = SETTING_PARKING_GOAL;
+	    		robotParked = false;
+	    	}
+	    }
 	    	break;
 	    }
 		break;
@@ -267,8 +282,9 @@ void StudentsRobot::updateStateMachine() {
 		    	binDeliveryStatus = PROCURING_BIN;
 		    	statusAfterNav = DeliveringBin;
 				break;
-			case PROCURING_BIN:
-				if(binHandler.checkBinProcurementStatus() == FINISHED_PROCUREMENT){
+			case PROCURING_BIN:{
+				BinProcurementRoutineStates procurementStatus = binHandler.checkBinProcurementStatus();
+				if(procurementStatus == FINISHED_PROCUREMENT){
 			    	binDeliveryStatus = GOING_TO_USER;
 			    	goalRow = 1;
 			    	goalColumn = -3;
@@ -277,6 +293,12 @@ void StudentsRobot::updateStateMachine() {
 			    	status = Navigating;
 			    	statusAfterNav = DeliveringBin;
 				}
+				else if(procurementStatus == TIMED_OUT_PROCUREMENT){
+					Serial.println("Procurement Timed Out. Going to running.");
+					status = Running;
+					binDeliveryStatus = SETTING_DELIVERY_LOCATION;
+				}
+			}
 				break;
 			case GOING_TO_USER:
 				status = Running;
@@ -299,13 +321,19 @@ void StudentsRobot::updateStateMachine() {
 		    	binReturnStatus = RETURNING_BIN;
 		    	statusAfterNav = ReturningBin;
 				break;
-			case RETURNING_BIN:
-				if(binHandler.checkBinReturnStatus() == FINISHED_RETURN){
+			case RETURNING_BIN:{
+				BinReturnRoutineStates returnState = binHandler.checkBinReturnStatus();
+				if(returnState == FINISHED_RETURN){
 			    	binReturnStatus = SETTING_RETURN_LOCATION;
-			    	// TODO: send communication to GUI that bin is returned
 					Serial.println("FINISHED RETURN, GOING TO RUNNING");
 			    	status = Running;
 				}
+				else if(returnState == TIMED_OUT_RETURN){
+			    	binReturnStatus = SETTING_RETURN_LOCATION;
+					Serial.println("TIMED_OUT, GOING TO RUNNING");
+			    	status = Running;
+				}
+			}
 				break;
 		}
 	break;

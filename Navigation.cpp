@@ -94,7 +94,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_ROW:
-			//Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
+			Serial.println("FINDING ROW: " + String(goalRow) +  "CURRENT ROW: " + String(chassis->myChassisPose.currentRow));
 			if(chassis->myChassisPose.currentRow != goalRow){
 				chassis->lineFollowForwards();
 			}
@@ -141,7 +141,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			break;
 		case FINDING_COLUMN:
-			//Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
+			Serial.println("FINDING COL: " + String(goalCol) +  "CURRENT COL: " + String(chassis->myChassisPose.currentColumn));
 			if(chassis->myChassisPose.currentColumn != goalCol){
 				chassis->lineFollowForwards();
 			}
@@ -152,12 +152,21 @@ NavigationStates Navigation::checkNavStatus(){
 			   }
 			}
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION:
-		    if(chassis-> statusOfChassisDriving() == REACHED_SETPOINT){
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION:{
+			DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+
+		    if(motionStatus == REACHED_SETPOINT){
 			    navState = navStateAfterMotionSetpointReached;
 		    }
+		    else if(motionStatus == TIMED_OUT){
+		    	navState = TIMED_OUT_NAVIGATION;
+		    }
+		}
             break;
 		case FINISHED_NAVIGATION:
+			navState = INITIALIZE_NAVIGATION;
+			break;
+		case TIMED_OUT_NAVIGATION:
 			navState = INITIALIZE_NAVIGATION;
 			break;
 		}
