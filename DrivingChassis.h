@@ -16,9 +16,10 @@
 #define WHEEL_DEGREES_TO_BODY_DEGREES 4.25F
 #define MM_TO_WHEEL_DEGREES 2.1174F
 #define WHEEL_DEGREES_TO_MM .472277F
-#define MAX_SPEED_MM_PER_SEC 100
+#define MAX_SPEED_MM_PER_SEC 100 // was 100, was 75
 #define MAX_MOTOR_EFFORT_DURING_TURN 260 //300 //275 // 500
 
+#define DISTANCE_TO_LINE_SENSOR     48
 
 /**
  * @enum DrivingStatus
@@ -90,14 +91,16 @@ public:
 	PIDMotor * myleft;
 	PIDMotor * myright;
 	bool adjustedHeading = false;
-	MotionType motionType;
+	MotionType motionType = DRIVING_FORWARDS;
 	unsigned long startTimeOfMovement_ms;
 	float wheelMovementKp = 3.5;// was 3.9
-	float turningMovementKp = 21; //was 9, 11.7, 17.5
+	float turningMovementKp = 21; //was 9, 11.7, 17.5, 21
+	float turningMovementKi = 2;
+	float turningMovementKd = 3;
 	float wheelMovementDeadband_mm = 2.5;
 	float wheelMovementDeadband_deg = .5;
-	float motionSetpoint;
-	float timeout_ms;
+	float motionSetpoint = 0;
+	float timeout_ms = 0;
 	Pose myChassisPose;
 	LineFollower lineSensor;
 
@@ -209,6 +212,8 @@ public:
 	 void lineFollowBackwards();
 
      void lineFollowForwards();
+
+     bool isCenteredOnLine();
 
 	/**
 	 * Stops all motors

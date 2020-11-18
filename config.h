@@ -51,24 +51,28 @@
 #define MOTOR3_DIR 26
 
 //Encoder pins
-#define MOTOR1_ENCA 19
-#define MOTOR1_ENCB 18
+#define MOTOR1_ENCA 18 // Gabe's is 19
+#define MOTOR1_ENCB 19 // Gabe's is 18
 
-#define MOTOR2_ENCA 17
-#define MOTOR2_ENCB 16
+#define MOTOR2_ENCA 16 // Gabe's is 17
+#define MOTOR2_ENCB 17 // Gabe's is 16
 
-#define MOTOR3_ENCB 25
-#define MOTOR3_ENCA 14
+#define MOTOR3_ENCB 14
+#define MOTOR3_ENCA 25
 
 //Stepper
-#define STEPPER_DIRECTION 33
-#define STEPPER_STEP      32
+//#define STEPPER_DIRECTION 33
+//#define STEPPER_STEP      32
 
 // Sensor Pins
-#define ANALOG_SENSE_ONE		36
-#define ANALOG_SENSE_TWO		39
+#define LEFT_LINE_SENSOR		36
+#define RIGHT_LINE_SENSOR		39
 #define ANALOG_SENSE_THREE		34
 #define ANALOG_SENSE_FOUR		35
+
+#define CLEAT_LIMIT_SWITCH 27
+#define BOTTOM_OPTICALSWITCH 32
+#define TOP_OPTICALSWITCH 33
 
 // Pins used by a perpheral, may be re-used
 #define BOOT_FLAG_PIN 			0

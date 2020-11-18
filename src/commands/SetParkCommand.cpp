@@ -20,7 +20,7 @@ void SetParkCommand::event(float * buffer) {
 	robotPointer -> goalRow = (int) row;
 	robotPointer -> goalColumn = (int) column;
 	robotPointer -> status = ParkingRobot;
-
+    Serial.println("RECIEVED PARK COMMAND");
 }
 
 

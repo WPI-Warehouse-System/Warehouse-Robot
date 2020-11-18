@@ -23,8 +23,11 @@ NavigationStates Navigation::checkNavStatus(){
 	switch(navState){
 		case INITIALIZE_NAVIGATION:
 			//Serial.println("INIT NAV");
+			if((chassis->myChassisPose.currentColumn == goalCol) && (chassis->myChassisPose.currentRow == goalRow)){
+				navState = FINISHED_NAVIGATION;
+			}
 			// are we in the outer lane?
-			if(chassis->myChassisPose.currentColumn == 0){
+			else if(chassis->myChassisPose.currentColumn == 0){
 				navState = TURN_TOWARDS_CORRECT_ROW;
 			}
 			else{
@@ -99,7 +102,7 @@ NavigationStates Navigation::checkNavStatus(){
 				chassis->stop();
 				// if we're at the right column, stop
 				if(chassis->myChassisPose.currentColumn == goalCol){
-					navState = FINISHED_NAVIGATION;
+				    navState = FINISHED_NAVIGATION;
 				}
 				//otherwise turn towards the right column
 				else if (goalCol != 0){
@@ -134,7 +137,7 @@ NavigationStates Navigation::checkNavStatus(){
 			}
 			// if we're at the right row
 			else{
-				navState = TURN_TOWARDS_CORRECT_COLUMN;
+				navState = TURN_TOWARDS_CORRECT_COLUMN;;
 			}
 			break;
 		case FINDING_COLUMN:
@@ -145,7 +148,7 @@ NavigationStates Navigation::checkNavStatus(){
 			else{
 			   chassis->stop();
 			   if(goalRow == chassis->myChassisPose.currentRow){
-			   					navState = FINISHED_NAVIGATION;
+					navState = FINISHED_NAVIGATION;
 			   }
 			}
 			break;

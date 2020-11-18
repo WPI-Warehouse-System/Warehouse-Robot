@@ -66,13 +66,13 @@ ExitParkingRoutineStates Parking::getOutOfParkingStatus(){
 	switch(exitParkingState){
 		case EXIT_PARKING_SPOT:
 			// this drive forward is used to get off the line indicating the edge of a parking spot
-			chassis->driveForward(30, 1000);
+			chassis->driveForward(30, 1500);
 		    exitParkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING;
 			exitParkingStateAfterMotionSetpointReached = DRIVE_UP_TO_OUTER_EDGE;
 		break;
 		// drive up to col 0 (outer edge)
 		case DRIVE_UP_TO_OUTER_EDGE:
-			chassis->driveStraight(-90, DRIVING_FORWARDS);
+			chassis->driveStraight(chassis->myChassisPose.currentHeading, DRIVING_FORWARDS);
 			// have we hit the outer edge?
 			if(chassis -> lineSensor.onMarker()){
 				chassis->stop();
@@ -83,9 +83,11 @@ ExitParkingRoutineStates Parking::getOutOfParkingStatus(){
 			// this drive forwards is so that we are in line with the world, wherever we chose to navigate to
 			// 130 IS a magic number. Once measurements are confirmed for the new robot, this needs to change into
 			// a variable.
-			chassis->driveForward(130, 2500);
-		    exitParkingState = WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING;
-			exitParkingStateAfterMotionSetpointReached = FINISHED_EXIT_PARKING;
+			chassis->driveStraight(90, DRIVING_FORWARDS);
+            if(chassis -> lineSensor.onMarker()){
+            	chassis->stop();
+            	exitParkingState = FINISHED_EXIT_PARKING;
+            }
 			break;
 		case WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING:
 			if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){

@@ -172,13 +172,15 @@ void DrivingChassis::turnToHeading(float degreesToRotateBase, int msDuration){
  * @note this function is fast-return and should not block
  */
 DrivingStatus DrivingChassis::statusOfChassisDriving() {
+	int currentOrientation = myChassisPose.getOrientationToClosest90();
 	switch(motionType){
-
 	    case TURNING:{
+	    	 static float accum = 0;
+	    	 static float lastHeadingError = 0;
 			 // check for timeout
 			 if((millis() - startTimeOfMovement_ms) > timeout_ms){
 					//timeout occured. Stop the robot
-					Serial.println("Detected Timeout\r\n");
+					Serial.println("Detected Timeout on Turn\r\n");
 					//Serial.println("CURRENT HEADING: " + String(myChassisPose.currentHeading));
 					stop();
 					adjustedHeading = false;
@@ -206,7 +208,18 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 					headingError += 360;
 				}
 			}
-			float motorEffort = (turningMovementKp) * headingError;
+
+			// Integral term
+			accum += headingError;
+			if(accum > 100){
+				accum = 100;
+			}
+
+			// derivative term
+			float deltaChange = lastHeadingError - headingError;
+			lastHeadingError = headingError;
+
+			float motorEffort = (turningMovementKp) * headingError + accum*turningMovementKi + deltaChange*turningMovementKd;
 			//myChassisPose.heading = -currentHeading; // - to account for what is considered a "positive" rotation
 			myChassisPose.currentHeading = currentHeading;
 			if(fabs(headingError) <= wheelMovementDeadband_deg)
@@ -214,6 +227,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 				//Serial.println("Reached Setpoint\r\n");
 				stop();
 				adjustedHeading = false;
+				accum = 0;
 				return REACHED_SETPOINT;
 			}
 			else{
@@ -236,7 +250,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    		// check for timeout
 	    		if((millis() - startTimeOfMovement_ms) > timeout_ms){
 	    			//timeout occured. Stop the robot
-	    			Serial.println("Detected Timeout\r\n");
+	    			Serial.println("Detected Timeout on Forwards\r\n");
 	    			stop();
 	    			return TIMED_OUT;
 	    		}
@@ -244,7 +258,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
+	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
+	    	    	driveStraight(currentOrientation, DRIVING_FORWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -263,7 +278,7 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	// check for timeout
 	    		if((millis() - startTimeOfMovement_ms) > timeout_ms){
 	    			//timeout occured. Stop the robot
-	    			Serial.println("Detected Timeout\r\n");
+	    			Serial.println("Detected Timeout on Backwards\r\n");
 	    			stop();
 	    			return TIMED_OUT;
 	    		}
@@ -271,7 +286,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = - currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
+	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
+	    	    	driveStraight(currentOrientation, DRIVING_BACKWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -330,7 +346,7 @@ void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 			headingError += 360;
 		}
 	}
-	float motorEffort = (turningMovementKp) * headingError;
+	float motorEffort = (turningMovementKp) * .75 * headingError;
 
 	if(direction == DRIVING_BACKWARDS){
 		myleft->setVelocityDegreesPerSecond((MAX_SPEED_MM_PER_SEC + motorEffort)*MM_TO_WHEEL_DEGREES);
@@ -398,13 +414,20 @@ void DrivingChassis::lineFollowBackwards(){
  * line follow in the forwards direction, if the line follower is mounted to the front of the robot
  */
 void DrivingChassis::lineFollowForwards(){
+	  // These sensors are for driving on the line
 	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
 	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+	  static int settlingCount = 0;
+	  // these sensors are for detecting a line on the center of rotation
+	  int lineDetectLeft = analogRead(LEFT_LINE_DETECT);
+	  float lineDetectRight = analogRead(RIGHT_LINE_DETECT);
 	  float leftCorrection = 0;
 	  float rightCorrection = 0;
-	  if(leftSensorValue >= lineSensor.ON_BLACK && rightSensorValue>= lineSensor.ON_BLACK)
+	  if(lineDetectLeft >= lineSensor.ON_BLACK && lineDetectRight >= lineSensor.ON_BLACK)
 	  {
+	   //Serial.println("Settling Count: " + String(settlingCount));
 	   if(lineSensor.canCountLine){
+		   //Serial.println("ON BLACK");
 		   lineSensor.lineCount++;
 	      // Mathematically speaking, this should only increment one of the following. Either
 	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
@@ -412,14 +435,17 @@ void DrivingChassis::lineFollowForwards(){
 
 		  // we need to count rows
 		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
-			  myChassisPose.rowCount += 1;
-		      if(myChassisPose.rowCount == 2){
-		    	  if(ordinalDirection_degrees == 180)
-		              myChassisPose.currentRow -= 1;
-		    	  else
-		    		  myChassisPose.currentRow += 1;
-		          myChassisPose.rowCount = 0;
-		      }
+//			  myChassisPose.rowCount += 1;
+//		      if(myChassisPose.rowCount == 2){
+//		    	  if(ordinalDirection_degrees == 180)
+//		              myChassisPose.currentRow -= 1;
+//		    	  else
+//		    		  myChassisPose.currentRow += 1;
+//		          myChassisPose.rowCount = 0;
+			  if(ordinalDirection_degrees == 180)
+				  myChassisPose.currentRow -= 1;
+			  else
+				  myChassisPose.currentRow += 1;
 		  }
 
 		  // we need to count columns
@@ -429,20 +455,52 @@ void DrivingChassis::lineFollowForwards(){
 
 	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
 	    }
-	    //Serial.println("Line Count: " + String(lineCount));
+	    settlingCount = 0;
 	  }
 
+	  else if(lineDetectLeft <= lineSensor.ON_GREY && lineDetectRight <= lineSensor.ON_GREY){
+		  settlingCount++;
+		  if(settlingCount > 100){
+			 settlingCount = 0;
+		     lineSensor.canCountLine = true;
+		  }
+	  }
 
-	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
-			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
-			lineSensor.canCountLine = true;
-	  }
-	  else{
-		  lineSensor.canCountLine = true;
-	  }
-	  myleft -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection);
-      myright -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection);
+	  rightCorrection = (lineSensor.ON_WHITE - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE)*lineSensor.lineFollowingKpForwards;
+	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection));
+      myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection));
+}
+
+bool DrivingChassis::isCenteredOnLine(){
+	static int settlingCount = 0;
+	int targetValue = (lineSensor.ON_GREY - 400);
+	int tolerance = 450;
+	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
+	int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+	float rightCorrection = (targetValue - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+    float leftCorrection =  (leftSensorValue - targetValue)*lineSensor.lineFollowingKpForwards;
+    int rightError = fabs(rightSensorValue - targetValue);
+    int leftError = fabs(leftSensorValue - targetValue);
+    if(rightError <= tolerance && leftError <= tolerance){
+    	settlingCount++;
+    }
+
+    else{
+    	settlingCount = 0;
+    }
+
+    if(settlingCount > 100){
+    	Serial.println("CENTERED");
+    	stop();
+    	return true;
+    }
+
+    myleft -> setVelocityDegreesPerSecond(leftCorrection);
+    myright -> setVelocityDegreesPerSecond(rightCorrection);
+
+    return false;
+
 }
 /**
  *
