@@ -77,7 +77,7 @@ bool LiftControl::SetLiftHeight(float mm){
 bool LiftControl::CheckIfPositionReached(){
 	// this will return true if lift is not homed, since targetLiftHeightTicks is 0, therefore condition is met
 	if(liftMotor->getPosition()<targetLiftHeightTicks+2 && liftMotor->getPosition()>targetLiftHeightTicks-2){
-		liftMotor->SetTunings(0.005, 0.0, 0.0);
+		liftMotor->SetTunings(0.0005, 0.0, 0.0);
 		return true;
 	}
 	else{

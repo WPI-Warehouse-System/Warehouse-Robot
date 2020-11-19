@@ -40,7 +40,7 @@ class LineFollower{
 	   float lineFollowingKpBackwards = .002*lineFollowingSpeedBackwards_mm_per_sec;
 	   //NOTE: The closer we want to be to black, the higher this gain needs to be. Since we will be staying on white 90% of the
 	   // time, I made it try to find grey, not wobble between black. This was an oversight on my part last time
-	   float lineFollowingKpForwards = .2; //1.6, was 1.3, 2.4, .4, .55
+	   float lineFollowingKpForwards = .15; //1.6, was 1.3, 2.4, .4, .55
 	   int lineCount = 0;
        bool canCountLine = false; // so we can start on a line
    	   int lineDebouncing = 75;
