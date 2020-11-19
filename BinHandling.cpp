@@ -71,7 +71,7 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterMotionSetpointReached = BACK_UP_TO_WORLD_PROCUREMENT;
 			break;
 		case BACK_UP_TO_WORLD_PROCUREMENT:
-			// check if we have a bin
+			// check if we STILL have a bin, its possible we never grabbed it
 			if(!digitalRead(CLEAT_LIMIT_SWITCH)){
 				chassis->driveStraight(0, DRIVING_BACKWARDS);
 				if(chassis->lineSensor.onMarker()){

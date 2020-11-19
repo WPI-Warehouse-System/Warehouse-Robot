@@ -6,6 +6,8 @@
  */
 
 
+// TODO: Set comms status whereever necessary
+
 #include "StudentsRobot.h"
 
 uint32_t startTime = 0;
@@ -221,6 +223,7 @@ void StudentsRobot::updateStateMachine() {
 				break;
 
 			case NAVIGATING:{
+				myCommandsStatus = NAV;
 				NavigationStates navRoutineStatus = navigation.checkNavStatus();
 				if(navRoutineStatus == FINISHED_NAVIGATION){
 					navigationStatus = SETTING_NAV_GOAL;
@@ -231,13 +234,11 @@ void StudentsRobot::updateStateMachine() {
 					navigationStatus = SETTING_NAV_GOAL;
 					Serial.println("NAV TIMED OUT. GOING TO RUNNING");
 					status = Running;
+					myCommandsStatus = Timed_out;
 				}
 			}
 				break;
 			}
-//		if(navigation.checkNavStatus() == FINISHED_NAVIGATION){
-//			status = statusAfterNav;
-//		}
 		break;
 
 	case ParkingRobot:
@@ -252,6 +253,7 @@ void StudentsRobot::updateStateMachine() {
 	    	statusAfterNav = ParkingRobot;
 	       break;
 	    case PARKING:{
+	    	myCommandsStatus = PRK;
 	    	ParkingRoutineStates parkingRoutineStatus = parking.checkParkingStatus();
 	    	if(parkingRoutineStatus == FINISHED_PARKING){
 		    	parkingStatus = SETTING_PARKING_GOAL;
@@ -264,12 +266,15 @@ void StudentsRobot::updateStateMachine() {
 	    		statusAfterNav = Running;
 	    		parkingStatus = SETTING_PARKING_GOAL;
 	    		robotParked = false;
+	    		myCommandsStatus = Timed_out;
 	    	}
 	    }
 	    	break;
 	    }
 		break;
 
+    // TODO: Make it clear to the GUI that there isn't a bin there, or that
+	// delivery unsuccessful
 	case DeliveringBin:
 		switch(binDeliveryStatus){
 			case SETTING_DELIVERY_LOCATION:
@@ -289,7 +294,6 @@ void StudentsRobot::updateStateMachine() {
 			    	goalRow = 1;
 			    	goalColumn = -3;
 			    	navigation.setNavGoal(goalRow, goalColumn); // replace with coordinates of designated drop off
-			    	Serial.println("Navigating to 0,0");
 			    	status = Navigating;
 			    	statusAfterNav = DeliveringBin;
 				}
@@ -302,7 +306,6 @@ void StudentsRobot::updateStateMachine() {
 				break;
 			case GOING_TO_USER:
 				status = Running;
-				// TODO: send communication to GUI that bin is delivered
 				binDeliveryStatus = SETTING_DELIVERY_LOCATION;
 				break;
 		}
@@ -311,10 +314,18 @@ void StudentsRobot::updateStateMachine() {
 	case ReturningBin:
 		switch(binReturnStatus){
 			case SETTING_RETURN_LOCATION:
-				Serial.println("GOT NEW RETURN COMMAND");
-				binReturnStatus = GOING_TO_SHELF;
-			    navigation.setNavGoal(goalRow, goalColumn);
-			    binHandler.setBinHeight(goalShelf);
+				if(!digitalRead(CLEAT_LIMIT_SWITCH)){
+					binReturnStatus = GOING_TO_SHELF;
+				    navigation.setNavGoal(goalRow, goalColumn);
+				    binHandler.setBinHeight(goalShelf);
+				    myCommandsStatus = RTN;
+				    // set comms status to returning
+				}
+				else{
+					myCommandsStatus = Bin_Not_on_Cleat;
+					status = Running;
+					// set comms status to waiting for bin
+				}
 				break;
 			case GOING_TO_SHELF:
 		    	status = Navigating;
