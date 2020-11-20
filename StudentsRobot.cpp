@@ -202,13 +202,13 @@ void StudentsRobot::updateStateMachine() {
 			    break;
 
 			case CHECKING_IF_PARKED:
-				Serial.println("CHECKING IF PARKED");
+				//Serial.println("CHECKING IF PARKED");
 				if(robotParked){
-				    Serial.println("PARKED");
+				  //  Serial.println("PARKED");
 					navigationStatus = LEAVING_PARKING_SPOT;
 				}
 				else{
-					Serial.println("NOT PARKED");
+					//Serial.println("NOT PARKED");
 					navigationStatus = NAVIGATING;
 				}
 				break;
@@ -217,7 +217,7 @@ void StudentsRobot::updateStateMachine() {
 				if(parking.getOutOfParkingStatus() == FINISHED_EXIT_PARKING){
 					navigationStatus = NAVIGATING;
 					robotParked = false;
-					Serial.println("LEFT PARKING SPOT");
+					//Serial.println("LEFT PARKING SPOT");
 					//Serial.println("NAVIGATING");
 				}
 				break;
@@ -290,7 +290,7 @@ void StudentsRobot::updateStateMachine() {
 			case PROCURING_BIN:{
 				BinProcurementRoutineStates procurementStatus = binHandler.checkBinProcurementStatus();
 				if(procurementStatus == FINISHED_PROCUREMENT){
-			    	binDeliveryStatus = GOING_TO_USER;
+			    	binDeliveryStatus = FINISHED_DELIVERY;
 			    	goalRow = 1;
 			    	goalColumn = -3;
 			    	navigation.setNavGoal(goalRow, goalColumn); // replace with coordinates of designated drop off
@@ -301,11 +301,26 @@ void StudentsRobot::updateStateMachine() {
 					Serial.println("Procurement Timed Out. Going to running.");
 					status = Running;
 					binDeliveryStatus = SETTING_DELIVERY_LOCATION;
+					myCommandsStatus = Timed_out;
+				}
+				else if(procurementStatus == NO_BIN_ON_SHELF){
+					Serial.println("Shelf is empty");
+					status = Running;
+					binDeliveryStatus = SETTING_DELIVERY_LOCATION;
+					myCommandsStatus = Bin_Not_on_Shelf;
+				}
+				else if(procurementStatus == PROCUREMENT_UNSUCCESSFUL){
+					Serial.println("Tried and could not grab bin");
+					status = Running;
+					binDeliveryStatus = SETTING_DELIVERY_LOCATION;
+					myCommandsStatus = Delivery_Unsuccesful;
 				}
 			}
 				break;
-			case GOING_TO_USER:
+			case FINISHED_DELIVERY:
+				Serial.println("FINISHED DELIVERY. SENDING TO GUI");
 				status = Running;
+				myCommandsStatus = Delivery_Done;
 				binDeliveryStatus = SETTING_DELIVERY_LOCATION;
 				break;
 		}
@@ -314,7 +329,9 @@ void StudentsRobot::updateStateMachine() {
 	case ReturningBin:
 		switch(binReturnStatus){
 			case SETTING_RETURN_LOCATION:
+				Serial.println("GIVEN RETURN COMMAND");
 				if(!digitalRead(CLEAT_LIMIT_SWITCH)){
+					Serial.println("RETURNING!");
 					binReturnStatus = GOING_TO_SHELF;
 				    navigation.setNavGoal(goalRow, goalColumn);
 				    binHandler.setBinHeight(goalShelf);
@@ -322,6 +339,7 @@ void StudentsRobot::updateStateMachine() {
 				    // set comms status to returning
 				}
 				else{
+					Serial.println("GIB MI BEAN PLUS");
 					myCommandsStatus = Bin_Not_on_Cleat;
 					status = Running;
 					// set comms status to waiting for bin
@@ -335,16 +353,21 @@ void StudentsRobot::updateStateMachine() {
 			case RETURNING_BIN:{
 				BinReturnRoutineStates returnState = binHandler.checkBinReturnStatus();
 				if(returnState == FINISHED_RETURN){
-			    	binReturnStatus = SETTING_RETURN_LOCATION;
-					Serial.println("FINISHED RETURN, GOING TO RUNNING");
-			    	status = Running;
+			    	binReturnStatus = FINISHED_RETURNING;
 				}
 				else if(returnState == TIMED_OUT_RETURN){
 			    	binReturnStatus = SETTING_RETURN_LOCATION;
 					Serial.println("TIMED_OUT, GOING TO RUNNING");
 			    	status = Running;
+			    	myCommandsStatus = Timed_out;
 				}
 			}
+				break;
+			case FINISHED_RETURNING:
+				binReturnStatus = SETTING_RETURN_LOCATION;
+				Serial.println("FINISHED RETURN, GOING TO RUNNING");
+				status = Running;
+				myCommandsStatus = Return_Done;
 				break;
 		}
 	break;

@@ -84,11 +84,11 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			// if we don't, increment a retry counter
 			else{
 				if(binExists){
-					// reset this. If we hit it again, we'll set it to true, but maybe we dropped it.
-					binExists = false;
 					retryCount++;
 					if(retryCount < MAX_RETRIES_PROCUREMENT){
 					     binProcurementState = RAISE_LIFT_TO_SHELF;
+						 // reset this. If we hit it again, we'll set it to true, but maybe we dropped it.
+						 binExists = false;
 					}
 					// if we try 5 times an no dice, give up.
 					else{
@@ -96,7 +96,8 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 						if(chassis->lineSensor.onMarker()){
 							// we backed up to the world
 							chassis->stop();
-							binProcurementState = TIMED_OUT_PROCUREMENT;
+							Serial.println("COULD NOT GRAB BIN");
+							binProcurementState = PROCUREMENT_UNSUCCESSFUL;
 							retryCount = 0;
 						}
 					}
@@ -105,8 +106,9 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 					chassis->driveStraight(0, DRIVING_BACKWARDS);
 					if(chassis->lineSensor.onMarker()){
 						// we backed up to the world
+						Serial.println("NO BIN ON SHELF");
 						chassis->stop();
-						binProcurementState = TIMED_OUT_PROCUREMENT;
+						binProcurementState = NO_BIN_ON_SHELF;
 						retryCount = 0;
 					}
 				}
@@ -134,6 +136,16 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 		}
             break;
 		case TIMED_OUT_PROCUREMENT:
+			binProcurementState = TURN_TO_BIN;
+			binExists = false;
+			retryCount = 0;
+			break;
+		case NO_BIN_ON_SHELF:
+			binProcurementState = TURN_TO_BIN;
+			binExists = false;
+			retryCount = 0;
+			break;
+		case PROCUREMENT_UNSUCCESSFUL:
 			binProcurementState = TURN_TO_BIN;
 			binExists = false;
 			retryCount = 0;
