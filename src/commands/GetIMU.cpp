@@ -131,16 +131,13 @@ float GetIMU::getEULER_tilt() {
 	return bufferINTERNAL[9];
 }
 float GetIMU::getWrappedAzimuth(){
-	// This is where the issue is. azimuth keeps growing, and you just
-	// subtract 360. That means when azimuth is like 1080, orientation is like 720....
-	// fix this!!!!
 	float orientation = getEULER_azimuth();
 	if(fabs(orientation) > 360){
 		if(orientation > 360){
-			orientation -= 360;
+			orientation = fmod(orientation, 360);
 		}
 		else{
-			orientation += 360;
+			orientation = fmod(orientation, -360);
 		}
 	}
 	return orientation;

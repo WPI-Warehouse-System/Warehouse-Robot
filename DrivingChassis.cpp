@@ -172,7 +172,7 @@ void DrivingChassis::turnToHeading(float degreesToRotateBase, int msDuration){
  * @note this function is fast-return and should not block
  */
 DrivingStatus DrivingChassis::statusOfChassisDriving() {
-	int currentOrientation = myChassisPose.getOrientationToClosest90();
+	//int currentOrientation = myChassisPose.getOrientationToClosest90();
 	switch(motionType){
 	    case TURNING:{
 	    	 static float accum = 0;
@@ -188,15 +188,6 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 			   }
 
 			float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
-			// wrap-around for currentHeading
-			if(fabs(currentHeading) > 360){
-				if(currentHeading > 360){
-					currentHeading -= 360;
-				}
-				else{
-					currentHeading += 360;
-				}
-			}
 			float headingError = motionSetpoint - currentHeading;
 
 			// we don't want to to make long turns
@@ -258,8 +249,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
-	    	    	driveStraight(currentOrientation, DRIVING_FORWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
+	    	    	//driveStraight(currentOrientation, DRIVING_FORWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -286,8 +277,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = - currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
-	    	    	driveStraight(currentOrientation, DRIVING_BACKWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
+	    	    	//driveStraight(currentOrientation, DRIVING_BACKWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -328,14 +319,6 @@ void DrivingChassis::stop(){
  */
 void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 	float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
-	if(fabs(currentHeading) > 360){
-		if(currentHeading > 360){
-			currentHeading -= 360;
-		}
-		else{
-			currentHeading += 360;
-		}
-	}
 	float headingError = targetHeading - currentHeading;
 	if(fabs(headingError) > 180){
 
