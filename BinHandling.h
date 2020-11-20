@@ -12,7 +12,7 @@
 #ifndef BINHANDLING_H_
 #define BINHANDLING_H_
 
-#define BIN_LIP_OFFSET 15 // 1.5 cm
+#define BIN_LIP_OFFSET 18 // 1.8 cm
 #define MAX_RETRIES_PROCUREMENT 5
 /*
  * @enum BinProcurementStates

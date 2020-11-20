@@ -426,8 +426,8 @@ void DrivingChassis::lineFollowForwards(){
 	  if(lineDetectLeft >= lineSensor.ON_BLACK_DETECT && lineDetectRight >= lineSensor.ON_BLACK_DETECT)
 	  {
 	   //Serial.println("Settling Count: " + String(settlingCount));
+	   //Serial.println("ON BLACK");
 	   if(lineSensor.canCountLine){
-		   //Serial.println("ON BLACK");
 		   lineSensor.lineCount++;
 	      // Mathematically speaking, this should only increment one of the following. Either
 	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
@@ -435,13 +435,6 @@ void DrivingChassis::lineFollowForwards(){
 
 		  // we need to count rows
 		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
-//			  myChassisPose.rowCount += 1;
-//		      if(myChassisPose.rowCount == 2){
-//		    	  if(ordinalDirection_degrees == 180)
-//		              myChassisPose.currentRow -= 1;
-//		    	  else
-//		    		  myChassisPose.currentRow += 1;
-//		          myChassisPose.rowCount = 0;
 			  if(ordinalDirection_degrees == 180)
 				  myChassisPose.currentRow -= 1;
 			  else
@@ -458,18 +451,46 @@ void DrivingChassis::lineFollowForwards(){
 	    settlingCount = 0;
 	  }
 
-	  else if(lineDetectLeft <= lineSensor.ON_GREY_DETECT && lineDetectRight <= lineSensor.ON_GREY_DETECT){
+	  else if(lineDetectLeft < lineSensor.ON_BLACK_DETECT && lineDetectRight <= lineSensor.ON_BLACK_DETECT){
 		  settlingCount++;
 		  if(settlingCount > lineSensor.lineDebouncing){
 			 settlingCount = 0;
+			 //Serial.println("NOT ON BLACK");
 		     lineSensor.canCountLine = true;
 		  }
+	  }
+
+	  // both, not either
+	  if((rightSensorValue >= lineSensor.ON_BLACK_FOLLOW) && (leftSensorValue >= lineSensor.ON_BLACK_FOLLOW))
+	  {
+		  myleft -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES);
+		  myright -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES);
+		  return;
 	  }
 
 	  rightCorrection = (lineSensor.ON_WHITE_FOLLOW - rightSensorValue)*lineSensor.lineFollowingKpForwards;
 	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE_FOLLOW)*lineSensor.lineFollowingKpForwards;
 	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection));
       myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection));
+}
+
+void DrivingChassis::lineFollowForwards(int speed){
+	  // These sensors are for driving on the line
+	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
+	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+	  static int settlingCount = 0;
+	  float leftCorrection = 0;
+	  float rightCorrection = 0;
+
+	  if((rightSensorValue >= lineSensor.ON_GREY_FOLLOW) && (leftSensorValue >= lineSensor.ON_GREY_FOLLOW))
+	  {
+		  return;
+	  }
+
+	  rightCorrection = (lineSensor.ON_WHITE_FOLLOW - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE_FOLLOW)*lineSensor.lineFollowingKpForwards;
+	  myleft -> setVelocityDegreesPerSecond((-speed*MM_TO_WHEEL_DEGREES + leftCorrection));
+      myright -> setVelocityDegreesPerSecond((speed*MM_TO_WHEEL_DEGREES + rightCorrection));
 }
 
 bool DrivingChassis::isCenteredOnLine(){

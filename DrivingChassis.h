@@ -94,8 +94,8 @@ public:
 	MotionType motionType = DRIVING_FORWARDS;
 	unsigned long startTimeOfMovement_ms;
 	float wheelMovementKp = 3.5;// was 3.9
-	float turningMovementKp = 15; //was 9, 11.7, 17.5, 21
-	float turningMovementKi = .25;
+	float turningMovementKp = 18.5;
+	float turningMovementKi = .5;
 	float turningMovementKd = .75;
 	float wheelMovementDeadband_mm = 2.5;
 	float wheelMovementDeadband_deg = .5;
@@ -212,6 +212,9 @@ public:
 	 void lineFollowBackwards();
 
      void lineFollowForwards();
+
+     //over loading for procurement more slowly
+     void lineFollowForwards(int speed);
 
      bool isCenteredOnLine();
 

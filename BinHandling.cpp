@@ -39,7 +39,8 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterLiftSetpointReached = APPROACH_BIN;
 			break;
 		case APPROACH_BIN:
-			chassis->driveStraight(0, DRIVING_FORWARDS);
+//			chassis->driveStraight(0, DRIVING_FORWARDS);
+			chassis->lineFollowForwards(115);
 			// if we hit the limit swtich, we've made contact with the bin
 			if(!digitalRead(CLEAT_LIMIT_SWITCH)){
 				chassis->stop();
@@ -163,7 +164,8 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 		case APPROACH_SHELF:
 //			Serial.println("APPROACHING SHELF");
 				// maybe we put in a timeout here? We can see how testing is going
-			chassis->driveStraight(0, DRIVING_FORWARDS);
+//			chassis->driveStraight(0, DRIVING_FORWARDS);
+			chassis->lineFollowForwards(115);
 			Serial.println(chassis->lineSensor.onMarkerFront());
 			if(chassis->lineSensor.onMarkerFront()){
 				chassis->stop();
