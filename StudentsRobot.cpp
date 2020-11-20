@@ -223,7 +223,6 @@ void StudentsRobot::updateStateMachine() {
 				break;
 
 			case NAVIGATING:{
-				myCommandsStatus = NAV;
 				NavigationStates navRoutineStatus = navigation.checkNavStatus();
 				if(navRoutineStatus == FINISHED_NAVIGATION){
 					navigationStatus = SETTING_NAV_GOAL;
