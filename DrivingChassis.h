@@ -94,8 +94,8 @@ public:
 	MotionType motionType = DRIVING_FORWARDS;
 	unsigned long startTimeOfMovement_ms;
 	float wheelMovementKp = 3.5;// was 3.9
-	float turningMovementKp = 18.5;
-	float turningMovementKi = .5;
+	float turningMovementKp = 19;
+	float turningMovementKi = .7;
 	float turningMovementKd = .75;
 	float wheelMovementDeadband_mm = 2.5;
 	float wheelMovementDeadband_deg = .5;
