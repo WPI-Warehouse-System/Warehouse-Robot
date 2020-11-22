@@ -21,7 +21,7 @@ bool LineFollower::onMarker(){
 bool LineFollower::onMarkerFront(){
 	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
     int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
-    return (leftSensorValue >= ON_BLACK_FOLLOW && rightSensorValue>= ON_BLACK_FOLLOW);
+    return (leftSensorValue >= ON_GREY_FOLLOW && rightSensorValue>= ON_GREY_FOLLOW);
 }
 
 void LineFollower::calibrate(){
