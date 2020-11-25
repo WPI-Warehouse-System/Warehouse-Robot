@@ -152,12 +152,21 @@ NavigationStates Navigation::checkNavStatus(){
 			   }
 			}
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION:
-		    if(chassis-> statusOfChassisDriving() == REACHED_SETPOINT){
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_NAVIGATION:{
+			DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+
+		    if(motionStatus == REACHED_SETPOINT){
 			    navState = navStateAfterMotionSetpointReached;
 		    }
+		    else if(motionStatus == TIMED_OUT){
+		    	navState = TIMED_OUT_NAVIGATION;
+		    }
+		}
             break;
 		case FINISHED_NAVIGATION:
+			navState = INITIALIZE_NAVIGATION;
+			break;
+		case TIMED_OUT_NAVIGATION:
 			navState = INITIALIZE_NAVIGATION;
 			break;
 		}

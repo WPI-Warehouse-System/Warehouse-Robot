@@ -172,7 +172,7 @@ void DrivingChassis::turnToHeading(float degreesToRotateBase, int msDuration){
  * @note this function is fast-return and should not block
  */
 DrivingStatus DrivingChassis::statusOfChassisDriving() {
-	int currentOrientation = myChassisPose.getOrientationToClosest90();
+	//int currentOrientation = myChassisPose.getOrientationToClosest90();
 	switch(motionType){
 	    case TURNING:{
 	    	 static float accum = 0;
@@ -188,15 +188,6 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 			   }
 
 			float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
-			// wrap-around for currentHeading
-			if(fabs(currentHeading) > 360){
-				if(currentHeading > 360){
-					currentHeading -= 360;
-				}
-				else{
-					currentHeading += 360;
-				}
-			}
 			float headingError = motionSetpoint - currentHeading;
 
 			// we don't want to to make long turns
@@ -258,8 +249,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
-	    	    	driveStraight(currentOrientation, DRIVING_FORWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_FORWARDS);
+	    	    	//driveStraight(currentOrientation, DRIVING_FORWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -286,8 +277,8 @@ DrivingStatus DrivingChassis::statusOfChassisDriving() {
 	    	    if(motionSetpoint != -1){
 	    	    	float currentDistanceMovedRightWheel_mm = (myright -> getAngleDegrees())*WHEEL_DEGREES_TO_MM;
 	    	    	float rightWheelError_mm = - currentDistanceMovedRightWheel_mm - motionSetpoint;
-	    	    	//driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
-	    	    	driveStraight(currentOrientation, DRIVING_BACKWARDS);
+	    	    	driveStraight(myChassisPose.currentHeading, DRIVING_BACKWARDS);
+	    	    	//driveStraight(currentOrientation, DRIVING_BACKWARDS);
 	    	    	if((fabs(rightWheelError_mm) < wheelMovementDeadband_mm)){
 						//Serial.println("Reached Setpoint \r\n");
 						stop();
@@ -328,14 +319,6 @@ void DrivingChassis::stop(){
  */
 void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 	float currentHeading = myChassisPose.initialHeading - IMU->getWrappedAzimuth();
-	if(fabs(currentHeading) > 360){
-		if(currentHeading > 360){
-			currentHeading -= 360;
-		}
-		else{
-			currentHeading += 360;
-		}
-	}
 	float headingError = targetHeading - currentHeading;
 	if(fabs(headingError) > 180){
 
@@ -362,53 +345,53 @@ void DrivingChassis::driveStraight(float targetHeading, MotionType direction){
 /**
  * line follow in the backwards direction, if the line follower is mounted to the back of the robot
  */
-void DrivingChassis::lineFollowBackwards(){
-	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
-	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
-	  float leftCorrection = 0;
-	  float rightCorrection = 0;
-	  if(leftSensorValue >= lineSensor.ON_BLACK && rightSensorValue>= lineSensor.ON_BLACK)
-	  {
-	   if(lineSensor.canCountLine){
-		   lineSensor.lineCount++;
-	      // Mathematically speaking, this should only increment one of the following. Either
-	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
-		  int ordinalDirection_degrees = myChassisPose.getOrientationToClosest90();
-
-		  // we need to count rows
-		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
-			  myChassisPose.rowCount += 1;
-		      if(myChassisPose.rowCount == 2){
-		    	  if(ordinalDirection_degrees == 180)
-		              myChassisPose.currentRow -= 1;
-		    	  else
-		    		  myChassisPose.currentRow += 1;
-		          myChassisPose.rowCount = 0;
-		      }
-		  }
-
-		  // we need to count columns
-		  else if((ordinalDirection_degrees == 90) || (ordinalDirection_degrees == -90)){
-			  myChassisPose.currentColumn += ordinalDirection_degrees/90;
-		  }
-
-	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
-	    }
-	    //Serial.println("Line Count: " + String(lineCount));
-	  }
-
-
-	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
-			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
-			lineSensor.canCountLine = true;
-	  }
-	  else{
-		  lineSensor.canCountLine = true;
-	  }
-	  myleft -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedBackwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection);
-      myright -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection);
-}
+//void DrivingChassis::lineFollowBackwards(){
+//	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
+//	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+//	  float leftCorrection = 0;
+//	  float rightCorrection = 0;
+//	  if(leftSensorValue >= lineSensor.ON_BLACK && rightSensorValue>= lineSensor.ON_BLACK)
+//	  {
+//	   if(lineSensor.canCountLine){
+//		   lineSensor.lineCount++;
+//	      // Mathematically speaking, this should only increment one of the following. Either
+//	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
+//		  int ordinalDirection_degrees = myChassisPose.getOrientationToClosest90();
+//
+//		  // we need to count rows
+//		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
+//			  myChassisPose.rowCount += 1;
+//		      if(myChassisPose.rowCount == 2){
+//		    	  if(ordinalDirection_degrees == 180)
+//		              myChassisPose.currentRow -= 1;
+//		    	  else
+//		    		  myChassisPose.currentRow += 1;
+//		          myChassisPose.rowCount = 0;
+//		      }
+//		  }
+//
+//		  // we need to count columns
+//		  else if((ordinalDirection_degrees == 90) || (ordinalDirection_degrees == -90)){
+//			  myChassisPose.currentColumn += ordinalDirection_degrees/90;
+//		  }
+//
+//	      lineSensor.canCountLine = false; // This is meant as a line "debouncing". We don't want to catch the same line twice.
+//	    }
+//	    //Serial.println("Line Count: " + String(lineCount));
+//	  }
+//
+//
+//	  else if(leftSensorValue >= lineSensor.ON_BLACK || rightSensorValue >= lineSensor.ON_BLACK){
+//			rightCorrection = (lineSensor.ON_BLACK - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+//			leftCorrection =  (leftSensorValue - lineSensor.ON_BLACK)*lineSensor.lineFollowingKpForwards;
+//			lineSensor.canCountLine = true;
+//	  }
+//	  else{
+//		  lineSensor.canCountLine = true;
+//	  }
+//	  myleft -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedBackwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection);
+//      myright -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection);
+//}
 
 /**
  * line follow in the forwards direction, if the line follower is mounted to the front of the robot
@@ -423,11 +406,11 @@ void DrivingChassis::lineFollowForwards(){
 	  float lineDetectRight = analogRead(RIGHT_LINE_DETECT);
 	  float leftCorrection = 0;
 	  float rightCorrection = 0;
-	  if(lineDetectLeft >= lineSensor.ON_BLACK && lineDetectRight >= lineSensor.ON_BLACK)
+	  if(lineDetectLeft >= lineSensor.ON_BLACK_DETECT && lineDetectRight >= lineSensor.ON_BLACK_DETECT)
 	  {
 	   //Serial.println("Settling Count: " + String(settlingCount));
+	   //Serial.println("ON BLACK");
 	   if(lineSensor.canCountLine){
-		   //Serial.println("ON BLACK");
 		   lineSensor.lineCount++;
 	      // Mathematically speaking, this should only increment one of the following. Either
 	      // row or column. Since there are two markers for each row, we need to only count once every two markers.
@@ -435,13 +418,6 @@ void DrivingChassis::lineFollowForwards(){
 
 		  // we need to count rows
 		  if((ordinalDirection_degrees == 180) || (ordinalDirection_degrees == 0)){
-//			  myChassisPose.rowCount += 1;
-//		      if(myChassisPose.rowCount == 2){
-//		    	  if(ordinalDirection_degrees == 180)
-//		              myChassisPose.currentRow -= 1;
-//		    	  else
-//		    		  myChassisPose.currentRow += 1;
-//		          myChassisPose.rowCount = 0;
 			  if(ordinalDirection_degrees == 180)
 				  myChassisPose.currentRow -= 1;
 			  else
@@ -458,23 +434,51 @@ void DrivingChassis::lineFollowForwards(){
 	    settlingCount = 0;
 	  }
 
-	  else if(lineDetectLeft <= lineSensor.ON_GREY && lineDetectRight <= lineSensor.ON_GREY){
+	  else if(lineDetectLeft < lineSensor.ON_BLACK_DETECT && lineDetectRight <= lineSensor.ON_BLACK_DETECT){
 		  settlingCount++;
-		  if(settlingCount > 100){
+		  if(settlingCount > lineSensor.lineDebouncing){
 			 settlingCount = 0;
+			 //Serial.println("NOT ON BLACK");
 		     lineSensor.canCountLine = true;
 		  }
 	  }
 
-	  rightCorrection = (lineSensor.ON_WHITE - rightSensorValue)*lineSensor.lineFollowingKpForwards;
-	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE)*lineSensor.lineFollowingKpForwards;
+	  // both, not either
+	  if((rightSensorValue >= lineSensor.ON_BLACK_FOLLOW) && (leftSensorValue >= lineSensor.ON_BLACK_FOLLOW))
+	  {
+		  myleft -> setVelocityDegreesPerSecond(-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES);
+		  myright -> setVelocityDegreesPerSecond(lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES);
+		  return;
+	  }
+
+	  rightCorrection = (lineSensor.ON_WHITE_FOLLOW - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE_FOLLOW)*lineSensor.lineFollowingKpForwards;
 	  myleft -> setVelocityDegreesPerSecond((-lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + leftCorrection));
       myright -> setVelocityDegreesPerSecond((lineSensor.lineFollowingSpeedForwards_mm_per_sec*MM_TO_WHEEL_DEGREES + rightCorrection));
 }
 
+void DrivingChassis::lineFollowForwards(int speed){
+	  // These sensors are for driving on the line
+	  int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
+	  int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);
+	  static int settlingCount = 0;
+	  float leftCorrection = 0;
+	  float rightCorrection = 0;
+
+	  if((rightSensorValue >= lineSensor.ON_GREY_FOLLOW) && (leftSensorValue >= lineSensor.ON_GREY_FOLLOW))
+	  {
+		  return;
+	  }
+
+	  rightCorrection = (lineSensor.ON_WHITE_FOLLOW - rightSensorValue)*lineSensor.lineFollowingKpForwards;
+	  leftCorrection =  (leftSensorValue - lineSensor.ON_WHITE_FOLLOW)*lineSensor.lineFollowingKpForwards;
+	  myleft -> setVelocityDegreesPerSecond((-speed*MM_TO_WHEEL_DEGREES + leftCorrection));
+      myright -> setVelocityDegreesPerSecond((speed*MM_TO_WHEEL_DEGREES + rightCorrection));
+}
+
 bool DrivingChassis::isCenteredOnLine(){
 	static int settlingCount = 0;
-	int targetValue = (lineSensor.ON_GREY - 400);
+	int targetValue = (lineSensor.ON_GREY_FOLLOW - 400);
 	int tolerance = 450;
 	int leftSensorValue = analogRead(LEFT_LINE_SENSOR);
 	int rightSensorValue = analogRead(RIGHT_LINE_SENSOR);

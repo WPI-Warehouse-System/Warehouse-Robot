@@ -12,7 +12,8 @@
 #ifndef BINHANDLING_H_
 #define BINHANDLING_H_
 
-#define BIN_LIP_OFFSET 15 // 1.5 cm
+#define BIN_LIP_OFFSET 18 // 1.8 cm
+#define MAX_RETRIES_PROCUREMENT 5
 /*
  * @enum BinProcurementStates
  * States used in the Bin procurement state machine, not the main robot state machine
@@ -30,6 +31,9 @@ enum BinProcurementRoutineStates{
 	FINISHED_PROCUREMENT,
 	WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT,
 	WAIT_FOR_LIFT_SETPOINT_REACHED_PROCUREMENT,
+	TIMED_OUT_PROCUREMENT,
+	PROCUREMENT_UNSUCCESSFUL,
+	NO_BIN_ON_SHELF
 
 };
 
@@ -48,6 +52,7 @@ enum BinReturnRoutineStates{
 	FINISHED_RETURN,
 	WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN,
 	WAIT_FOR_LIFT_SETPOINT_REACHED_RETURN,
+	TIMED_OUT_RETURN,
 };
 
 class BinHandling{

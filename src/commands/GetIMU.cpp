@@ -134,10 +134,10 @@ float GetIMU::getWrappedAzimuth(){
 	float orientation = getEULER_azimuth();
 	if(fabs(orientation) > 360){
 		if(orientation > 360){
-			orientation -= 360;
+			orientation = fmod(orientation, 360);
 		}
 		else{
-			orientation += 360;
+			orientation = fmod(orientation, -360);
 		}
 	}
 	return orientation;

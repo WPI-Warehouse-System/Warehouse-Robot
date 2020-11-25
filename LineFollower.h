@@ -26,27 +26,24 @@
 class LineFollower{
     public:
 	   LineFollower();
-	   // on black line
-//	   const int ON_BLACK = 3700;//3750;
-//	   const int ON_GREY = 1950;
-//	   const int ON_WHITE = 200;
-//	   int lineFollowingSpeedForwards_mm_per_sec = 190; // was 150, 125 (& 1.6 below), was 100, 175
-//	   int lineFollowingSpeedBackwards_mm_per_sec = 175;
-//	   float lineFollowingKpBackwards = .002*lineFollowingSpeedBackwards_mm_per_sec;
 //	   //NOTE: The closer we want to be to black, the higher this gain needs to be. Since we will be staying on white 90% of the
 //	   // time, I made it try to find grey, not wobble between black. This was an oversight on my part last time
 //	   float lineFollowingKpForwards = .035; //1.6, was 1.3, 2.4, .4, .55
-	   const int ON_BLACK = 3800;//3750;
-	   const int ON_GREY = 3250;
-	   const int ON_WHITE = 2700;
-	   int lineFollowingSpeedForwards_mm_per_sec = 175; // was 150, 125 (& 1.6 below), was 100, 175
+	   const int ON_BLACK_FOLLOW = 3600;//3750;
+	   const int ON_GREY_FOLLOW = 3150;
+	   const int ON_WHITE_FOLLOW = 2700;
+	   const int ON_BLACK_DETECT = 3800;
+	   const int ON_GREY_DETECT = 2800;
+	   const int ON_WHITE_DETECT = 1800;
+	   int lineFollowingSpeedForwards_mm_per_sec = 170; // was 150, 125 (& 1.6 below), was 100, 175
 	   int lineFollowingSpeedBackwards_mm_per_sec = 175;
 	   float lineFollowingKpBackwards = .002*lineFollowingSpeedBackwards_mm_per_sec;
 	   //NOTE: The closer we want to be to black, the higher this gain needs to be. Since we will be staying on white 90% of the
 	   // time, I made it try to find grey, not wobble between black. This was an oversight on my part last time
-	   float lineFollowingKpForwards = .24; //1.6, was 1.3, 2.4, .4, .55
+	   float lineFollowingKpForwards = .12; //1.6, was 1.3, 2.4, .4, .55
 	   int lineCount = 0;
        bool canCountLine = false; // so we can start on a line
+   	   int lineDebouncing = 100;
 
 	   void resetLineCount();
 	   bool onMarker();

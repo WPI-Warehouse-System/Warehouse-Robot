@@ -23,6 +23,10 @@ void BinHandling::setBinHeight(int height){
 }
 
 BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
+	static int retryCount = 0;
+	static bool binExists = false;
+	static int lineCountProcure = 0;
+	static bool gotFirstLine = false;
 	switch(binProcurementState){
 		case TURN_TO_BIN:
 			chassis->turnToHeading(0, 7500);
@@ -35,11 +39,26 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterLiftSetpointReached = APPROACH_BIN;
 			break;
 		case APPROACH_BIN:
-			// maybe we put in a timeout here? We can see how testing is going
-			chassis->driveStraight(0, DRIVING_FORWARDS);
+//			chassis->driveStraight(0, DRIVING_FORWARDS);
+			chassis->lineFollowForwards(115);
+			// if we hit the limit swtich, we've made contact with the bin
 			if(!digitalRead(CLEAT_LIMIT_SWITCH)){
 				chassis->stop();
 				binProcurementState = GRAB_BIN;
+				binExists = true;
+				gotFirstLine = false;
+			}
+			// we will also read the line in the back. (maybe there is not bin there)
+			else if(chassis->lineSensor.onMarkerFront() && !gotFirstLine){
+				gotFirstLine = true;
+			}
+
+			// we've driven past the first line, there is no bin there
+			if(!chassis->lineSensor.onMarkerFront() && gotFirstLine){
+				binExists = false;
+				gotFirstLine = false;
+				chassis->stop();
+				binProcurementState = BACK_AWAY_FROM_SHELF_PROCUREMENT;
 			}
 			break;
 		case GRAB_BIN:
@@ -53,11 +72,46 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 			binProcurementStateAfterMotionSetpointReached = BACK_UP_TO_WORLD_PROCUREMENT;
 			break;
 		case BACK_UP_TO_WORLD_PROCUREMENT:
-			chassis->driveStraight(0, DRIVING_BACKWARDS);
-			if(chassis->lineSensor.onMarker()){
-				// we backed up to the world
-				chassis->stop();
-				binProcurementState = LOWER_BIN;
+			// check if we STILL have a bin, its possible we never grabbed it
+			if(!digitalRead(CLEAT_LIMIT_SWITCH)){
+				chassis->driveStraight(0, DRIVING_BACKWARDS);
+				if(chassis->lineSensor.onMarker()){
+					// we backed up to the world
+					chassis->stop();
+					binProcurementState = LOWER_BIN;
+				}
+			}
+			// if we don't, increment a retry counter
+			else{
+				if(binExists){
+					retryCount++;
+					if(retryCount < MAX_RETRIES_PROCUREMENT){
+					     binProcurementState = RAISE_LIFT_TO_SHELF;
+						 // reset this. If we hit it again, we'll set it to true, but maybe we dropped it.
+						 binExists = false;
+					}
+					// if we try 5 times an no dice, give up.
+					else{
+						chassis->driveStraight(0, DRIVING_BACKWARDS);
+						if(chassis->lineSensor.onMarker()){
+							// we backed up to the world
+							chassis->stop();
+							Serial.println("COULD NOT GRAB BIN");
+							binProcurementState = PROCUREMENT_UNSUCCESSFUL;
+							retryCount = 0;
+						}
+					}
+				}
+				else{
+					chassis->driveStraight(0, DRIVING_BACKWARDS);
+					if(chassis->lineSensor.onMarker()){
+						// we backed up to the world
+						Serial.println("NO BIN ON SHELF");
+						chassis->stop();
+						binProcurementState = NO_BIN_ON_SHELF;
+						retryCount = 0;
+					}
+				}
 			}
 			break;
 		case LOWER_LIFT:
@@ -68,12 +122,34 @@ BinProcurementRoutineStates BinHandling::checkBinProcurementStatus(){
 		case FINISHED_PROCUREMENT:
 			Serial.println("FINISHED PROCUREMENT");
 			binProcurementState = TURN_TO_BIN;
+			binExists = false;
+			retryCount = 0;
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT:
-		    if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_PROCUREMENT:{
+		    DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+		    if(motionStatus == REACHED_SETPOINT){
 			    binProcurementState = binProcurementStateAfterMotionSetpointReached;
 		    }
+			else if(motionStatus == TIMED_OUT){
+				binProcurementState = TIMED_OUT_PROCUREMENT;
+			}
+		}
             break;
+		case TIMED_OUT_PROCUREMENT:
+			binProcurementState = TURN_TO_BIN;
+			binExists = false;
+			retryCount = 0;
+			break;
+		case NO_BIN_ON_SHELF:
+			binProcurementState = TURN_TO_BIN;
+			binExists = false;
+			retryCount = 0;
+			break;
+		case PROCUREMENT_UNSUCCESSFUL:
+			binProcurementState = TURN_TO_BIN;
+			binExists = false;
+			retryCount = 0;
+			break;
 	    case WAIT_FOR_LIFT_SETPOINT_REACHED_PROCUREMENT:
 			 if(lift->CheckIfPositionReached()){
 				    binProcurementState = binProcurementStateAfterLiftSetpointReached;
@@ -98,9 +174,11 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 			binReturnStateAfterLiftSetpointReached = APPROACH_SHELF;
 			break;
 		case APPROACH_SHELF:
-			//Serial.println("APPROACHING SHELF");
+//			Serial.println("APPROACHING SHELF");
 				// maybe we put in a timeout here? We can see how testing is going
-			chassis->driveStraight(0, DRIVING_FORWARDS);
+//			chassis->driveStraight(0, DRIVING_FORWARDS);
+			chassis->lineFollowForwards(115);
+			Serial.println(chassis->lineSensor.onMarkerFront());
 			if(chassis->lineSensor.onMarkerFront()){
 				chassis->stop();
 				binReturnState = PLACE_BIN_ON_SHELF;
@@ -135,10 +213,18 @@ BinReturnRoutineStates BinHandling::checkBinReturnStatus(){
 		case FINISHED_RETURN:
 			binReturnState = TURN_TO_SHELF;
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN:
-		    if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
+		case TIMED_OUT_RETURN:
+			binReturnState = TURN_TO_SHELF;
+			break;
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_BIN_RETURN:{
+		    DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+		    if(motionStatus == REACHED_SETPOINT){
 			    binReturnState = binReturnStateAfterMotionSetpointReached;
 		    }
+			else if(motionStatus == TIMED_OUT){
+				binReturnState = TIMED_OUT_RETURN;
+			}
+		}
             break;
 	    case WAIT_FOR_LIFT_SETPOINT_REACHED_RETURN:
 			 if(lift->CheckIfPositionReached()){

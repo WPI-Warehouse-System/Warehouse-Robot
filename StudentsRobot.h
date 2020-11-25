@@ -43,19 +43,27 @@ const String StringStates[14] = {"StartupRobot", "StartRunning", "Running", "Hal
  * what state your robot is in.
  */
 enum ComStackStatusState {
-	Ready_for_new_task = 0,
-	Heading_to_pickup = 1,
-	Waiting_for_approval_to_pickup = 2,
-	Picking_up = 3,
-	Heading_to_Dropoff = 4,
-	Waiting_for_approval_to_dropoff = 5,
-	Dropping_off = 6,
-	Heading_to_safe_zone = 7,
-	Fault_failed_pickup = 8,
-	Fault_failed_dropoff = 9,
-	Fault_excessive_load = 10,
-	Fault_obstructed_path = 11,
-	Fault_E_Stop_pressed = 12
+	Starting_up = 0,
+	Starting_to_run = 1,
+	IDLE = 2,
+	Stopping = 3,
+	Stopped = 4,
+	WFMF= 5,
+	WFT = 6,
+	Testing_Feature = 7,
+	NAV = 8,
+	PRK = 9,
+	Homing = 10,
+	MovingLift = 11,
+	DLV = 12,
+	RTN = 13,
+	Delivery_Done = 14,
+	Return_Done = 15,
+	Bin_Not_on_Cleat = 16,
+	Bin_Not_on_Shelf = 17,
+	Delivery_Unsuccesful = 18,
+	Timed_out = 19,
+
 };
 
 /**
@@ -84,7 +92,7 @@ enum BinDeliveryStates {
 	SETTING_DELIVERY_LOCATION = 0,
 	GOING_TO_BIN = 1,
 	PROCURING_BIN = 2,
-	GOING_TO_USER = 3,
+	FINISHED_DELIVERY = 3,
 };
 
 /**
@@ -94,6 +102,7 @@ enum BinReturnStates {
 	SETTING_RETURN_LOCATION = 0,
 	GOING_TO_SHELF = 1,
 	RETURNING_BIN = 2,
+	FINISHED_RETURNING = 3,
 };
 
 
@@ -131,7 +140,7 @@ private:
 	GetIMU * IMU;
 public:
 	float liftHeight = 0;//In mm
-	bool robotParked = false; // make false if not starting false
+	bool robotParked = true; // make false if not starting in parked
 	/**
 	 * Constructor for StudentsRobot
 	 *
@@ -150,7 +159,7 @@ public:
 	 *
 	 * this is sent upstream to the Java GUI to notify it of current state
 	 */
-	ComStackStatusState myCommandsStatus = Picking_up;
+	ComStackStatusState myCommandsStatus = IDLE;
 	/**
 	 * This is internal data representing the runtime status of the robot for use in its state machine
 	 */

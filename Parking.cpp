@@ -49,13 +49,21 @@ ParkingRoutineStates Parking::checkParkingStatus(){
             	parkingState = FINISHED_PARKING;
             }
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_PARKING:
-			if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
-				parkingState = parkingStateAfterMotionSetpointReached;
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_PARKING:{
+		    DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+		    if(motionStatus == REACHED_SETPOINT){
+		    	parkingState = parkingStateAfterMotionSetpointReached;
+		    }
+			else if(motionStatus == TIMED_OUT){
+				parkingState = TIMED_OUT_PARKING;
 			}
+		}
             break;
 		case FINISHED_PARKING:
 			//Serial.println("PARKED");
+			parkingState = INITIALIZE_PARKING;
+			break;
+		case TIMED_OUT_PARKING:
 			parkingState = INITIALIZE_PARKING;
 			break;
 		}
@@ -89,14 +97,23 @@ ExitParkingRoutineStates Parking::getOutOfParkingStatus(){
             	exitParkingState = FINISHED_EXIT_PARKING;
             }
 			break;
-		case WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING:
-			if(chassis->statusOfChassisDriving() == REACHED_SETPOINT){
-				exitParkingState = exitParkingStateAfterMotionSetpointReached;
+		case WAIT_FOR_MOTION_SETPOINT_REACHED_EXIT_PARKING:{
+		    DrivingStatus motionStatus = chassis -> statusOfChassisDriving();
+		    if(motionStatus == REACHED_SETPOINT){
+		    	exitParkingState = exitParkingStateAfterMotionSetpointReached;
+		    }
+			else if(motionStatus == TIMED_OUT){
+				exitParkingState = TIMED_OUT_EXIT_PARKING;
 			}
+		}
             break;
+		case TIMED_OUT_EXIT_PARKING:
+			exitParkingState = EXIT_PARKING_SPOT;
+			break;
 		case FINISHED_EXIT_PARKING:
 			Serial.println("EXITED PARKING_SPOT");
 			exitParkingState = EXIT_PARKING_SPOT;
+			break;
 		}
 	return exitParkingState;
 }
