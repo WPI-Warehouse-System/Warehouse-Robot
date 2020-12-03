@@ -129,14 +129,11 @@ public:
 	void driveBackwardsFromInterpolation(float mmDistanceFromCurrent, int msDuration);
 
 	/**
-	 * Start a drive backwards action. Will return false when finished moving. Will stop when reached setpoint or timeout.
-	 * Specifying a mmDistanceFromCurrent of '0' will move the robot indefinitely.
+	 * Start a drive backwards action.
 	 *
 	 * @param mmDistanceFromCurrent is the distance the mobile base should drive backwards
 	 * @param msDuration is the time in miliseconds that the drive action should take (this is a timeout)
 	 *
-	 * @note this function is fast-return and should not block. Whatever is calling this should repeatedly do so
-	 * until this function returns false due to reaching the set-point or timing out.
 	 */
 	void driveBackwards(float mmDistanceFromCurrent, int msDuration);
 
@@ -151,15 +148,11 @@ public:
 	void driveForwardFromInterpolation(float mmDistanceFromCurrent, int msDuration);
 
 	/**
-	 * Start a drive forwards action. Will return false when finished moving. Will stop when reached setpoint or timeout.
-	 * Specifying a mmDistanceFromCurrent of '0' will move the robot indefinitely.
+	 * Start a drive forwards action.
 	 *
 	 * @param mmDistanceFromCurrent is the distance the mobile base should drive forward
 	 * @param msDuration is the time in miliseconds that the drive action should take (this is a timeout)
 	 *
-	 * @note this function is fast-return and should not block. Whatever is calling this should repeatedly do so
-	 * until this function returns false due to reaching the set-point or timing out. Make sure to change state when this reaches a setpoint.
-	 * Otherwise, this will try to reach a new setpoint (imagine driving indefinitely)
 	 */
 	void driveForward(float mmDistanceFromCurrent, int msDuration);
 
@@ -181,7 +174,7 @@ public:
 	void turnDegreesFromInterpolation(float degreesToRotateBase, int msDuration);
 
 	/**
-	 * Start a turn action. Will return false when finished moving. Will stop when reached setpoint or timeout.
+	 * Start a turn action.
 	 *
 	 * This action rotates the robot around the center line made up by the contact points of the left and right wheels.
 	 * Positive angles should rotate to the left
@@ -191,8 +184,6 @@ public:
 	 * @param desiredHeading is the desired angle the robot should reach
 	 * @param msDuration is the time in miliseconds that the drive action should take (this is a timeout)
 	 *
-	 * @note this function is fast-return and should not block. Whatever is calling this should repeatedly do so
-	 * until this function returns false due to reaching the set-point or timing out.
 	 */
 	void turnToHeading(float desiredHeading, int msDuration);
 
@@ -223,6 +214,9 @@ public:
 	 */
 	void stop();
 
+	/**
+	 * Drive straight using the IMU indefinitely
+	 */
 	void driveStraight(float targetHeading, MotionType direction);
 
 	/**
